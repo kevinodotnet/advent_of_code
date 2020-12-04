@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
+
 require 'pry'
+require 'benchmark'
 
 def input
   %w(
@@ -8,28 +10,101 @@ def input
   ).map{|i| i.to_i}
 end
 
-values = []
-input.each do |a|
-  input.each do |b|
-    values << [a,b].sort if a + b == 2020
-  end
-end
-
-values.uniq.each do |a,b|
-  puts a * b
-end
-
-puts "what is the product of the three entries that sum to 2020?"
-
-values = []
-input.each do |a|
-  input.each do |b|
-    input.each do |c|
-      values << [a,b,c].sort if a + b + c == 2020
+def part1_simple
+  puts __method__
+  values = []
+  input.each do |a|
+    input.each do |b|
+      values << [a,b].sort if a + b == 2020
     end
   end
+
+  values.uniq.each do |a,b|
+    puts a * b
+  end
 end
 
-values.uniq.each do |a,b,c|
-  puts a * b * c
+def part2_simple
+  values = []
+  input.each do |a|
+    input.each do |b|
+      input.each do |c|
+        values << [a,b,c].sort if a + b + c == 2020
+      end
+    end
+  end
+  values.uniq
 end
+
+def part2_faster1
+  values = []
+  numbers = input
+  numbers.each do |a|
+    numbers.each do |b|
+      numbers.each do |c|
+        values << [a,b,c].sort if a + b + c == 2020
+      end
+    end
+  end
+  values.uniq
+end
+
+def part2_faster2
+  values = []
+  numbers = input.sort
+  numbers.each do |a|
+    numbers.select{|n| n >= a}.each do |b|
+      numbers.select{|n| n >= b}.each do |c|
+        values << [a,b,c].sort if a + b + c == 2020
+      end
+    end
+  end
+  values
+end
+
+def part2_faster3
+  values = []
+  numbers = input.sort
+  numbers.each do |a|
+    numbers.select{|n| n >= a}.each do |b|
+      val = a + b
+      next if val > 2020
+      numbers.select{|n| n >= b}.each do |c|
+        val = a + b + c
+        break if val > 2020
+        values << [a,b,c].sort if val == 2020
+      end
+    end
+  end
+  values
+end
+
+def part2_faster4
+  values = []
+  numbers = input.sort
+  numbers.each do |a|
+    numbers2 = numbers.select{|n| n >= a && (a + n <= 2020)}
+    numbers2.each do |b|
+      numbers2.select{|n| n >= b && (a + b + n == 2020)}.each do |c|
+        values << [a,b,c]
+      end
+    end
+  end
+  values
+end
+
+
+LOOPS = 100
+
+#puts "part2_simple: #{part2_simple}"
+#puts "part2_faster1: #{part2_faster1}"
+#puts "part2_faster2: #{part2_faster2}"
+puts "part2_faster3: #{part2_faster3}"
+puts "part2_faster4: #{part2_faster4}"
+
+puts Benchmark.measure { LOOPS.times { part2_faster4} }
+puts Benchmark.measure { LOOPS.times { part2_faster3} }
+
+#puts Benchmark.measure { LOOPS.times { part2_faster2} }
+#puts Benchmark.measure { LOOPS.times { part2_faster1} }
+#puts Benchmark.measure { LOOPS.times { part2_simple } }
