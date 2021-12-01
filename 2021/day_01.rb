@@ -21,23 +21,49 @@ def input
     File.read($0.gsub(/rb$/,'input')).split("\n").map{|i| i.to_i}
 end
 
-class Solution
+class SolutionA
+    def initialize(data)
+        @data = data
+    end
+    def count_increases(data)
+        result = 0
+        data = data.compact
+        data.each_with_index do |v, i|
+            result += 1 if i > 0 && data[i] > data[i-1]
+        end
+        result
+    end
+    def solve
+        count_increases(@data)
+    end
+end
+
+class SolutionB < SolutionA
     def initialize(data)
         @data = data
     end
     def solve
-        result = 0
-        @data.each_with_index do |v, i|
-            result += 1 if i > 0 && @data[i] > @data[i-1]
+        windows = @data.map.with_index do |v, i|
+            if i < 2
+                nil
+            else
+                @data.slice((i-2)..(i)).sum
+            end
         end
-        result
+        count_increases(windows)
     end
 end
 
 puts "#" * 100
-puts Solution.new(test_input).solve
+puts "expecting 7"
+puts SolutionA.new(test_input).solve
 puts "#" * 100
-puts Solution.new(input).solve
+puts SolutionA.new(input).solve
+
+puts "#" * 100
+puts "expecting 5"
+puts SolutionB.new(test_input).solve
+puts SolutionB.new(input).solve
 
 # --- Day 1: Sonar Sweep ---
 # You're minding your own business on a ship at sea when the overboard alarm goes off! You rush to see 
