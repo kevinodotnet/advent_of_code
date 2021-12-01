@@ -17,13 +17,13 @@ def test_input
     ).map{|i| i.to_i}
 end
 
+def input
+    File.read($0.gsub(/rb$/,'input')).split("\n").map{|i| i.to_i}
+end
+
 class Solution
     def initialize(data)
-        if data.class == String
-            @data = data.split("\n").map{|i| i.to_i}
-        else
-            @data = data
-        end
+        @data = data
     end
     def solve
         result = 0
@@ -37,7 +37,7 @@ end
 puts "#" * 100
 puts Solution.new(test_input).solve
 puts "#" * 100
-puts Solution.new(File.read($0.gsub(/rb$/,'input'))).solve
+puts Solution.new(input).solve
 
 # --- Day 1: Sonar Sweep ---
 # You're minding your own business on a ship at sea when the overboard alarm goes off! You rush to see 
