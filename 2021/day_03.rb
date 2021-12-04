@@ -60,9 +60,39 @@ class SolutionA
 end
 
 class SolutionB < SolutionA
-    def initialize(data)
+    def most_common_at(data, i, default)
+        r = data.map{|d| d[i]}
+        c0 = r.select{|i| i == 0}.count
+        c1 = r.select{|i| i == 1}.count
+        return default if c0 == c1
+        c0 > c1 ? 0 : 1
+    end
+    def least_common_at(data, i, default)
+        r = most_common_at(data, i, nil)
+        return default if r.nil?
+        r == 0 ? 1 : 0
+    end
+    def oxygen
+        result = @data.dup
+        (0...@data.first.count).each do |i|
+            next if result.count == 1
+            result = result.select{|d| d[i] == most_common_at(result, i, 1)}
+        end
+        result = result.first
+        result.join('').to_i(2)
+    end
+    def co2_scrubber
+        result = @data.dup
+        (0...@data.first.count).each do |i|
+            next if result.count == 1
+            least_common = least_common_at(result, i, 0)
+            result = result.select{|d| d[i] == least_common}
+        end
+        result = result.first
+        result.join('').to_i(2)
     end
     def solve
+        oxygen * co2_scrubber
     end
 end
 
@@ -70,6 +100,6 @@ puts "#" * 100
 puts "test: #{SolutionA.new(test_input).solve}"
 puts "full: #{SolutionA.new(input).solve}"
 
-# puts "#" * 100
-# puts "test: #{SolutionB.new(test_input).solve}"
-# puts "full: #{SolutionB.new(input).solve}"
+puts "#" * 100
+puts "test: #{SolutionB.new(test_input).solve}"
+puts "full: #{SolutionB.new(input).solve}"
