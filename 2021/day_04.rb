@@ -67,7 +67,7 @@ class SolutionA
         lines = lines.map { |l| l.gsub(/^ */,'') }
         @picks = lines.shift.split(",").map { |i| i.to_i }
         lines.shift
-        @boards = []
+        @boards = Set.new
         s_index = 0
         lines.each_with_index do |v, i|
             if v == ""
@@ -77,11 +77,14 @@ class SolutionA
         end
         @boards << Board.new(lines.slice(s_index, 5).map{|l| l.split(/  */).map{|d| d.to_i}})
     end
+    def play(pick)
+        @boards.each do |board|
+            board.play(pick)
+        end
+    end
     def solve
         @picks.each_with_index do |pick, i|
-            @boards.each do |board|
-                board.play(pick)
-            end
+            play(pick)
             winners = @boards.select{|b| b.won?}
             raise StandardError, "multiple winners" if winners.count > 1
             if winners.any?
@@ -94,6 +97,20 @@ end
 
 class SolutionB < SolutionA
     def solve
+        winners_by_round = []
+        @picks.each_with_index do |pick, i|
+            play(pick)
+            winners = Set.new(@boards.select{|b| b.won?})
+            winners_by_round << {
+                pick: pick,
+                winners: winners
+            } if winners.any?
+            @boards = @boards - winners
+        end
+        raise StandardError, "No single winner" unless winners_by_round.last[:winners].count == 1
+        winner = winners_by_round.last[:winners].first
+        pick = winners_by_round.last[:pick]
+        winner.score * pick
     end
 end
 
@@ -101,6 +118,6 @@ puts "#" * 100
 puts "test: #{SolutionA.new(test_input).solve}"
 puts "full: #{SolutionA.new(input).solve}"
 
-# puts "#" * 100
-# puts "test: #{SolutionB.new(test_input).solve}"
-# puts "full: #{SolutionB.new(input).solve}"
+puts "#" * 100
+puts "test: #{SolutionB.new(test_input).solve}"
+puts "full: #{SolutionB.new(input).solve}"
