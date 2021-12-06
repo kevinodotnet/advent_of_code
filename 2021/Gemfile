@@ -1,4 +1,9 @@
 source 'https://rubygems.org'
 
+# bundle install --path vendor/bundle
+
 gem 'minitest'
+gem 'minitest-focus'
 gem 'pry'
+gem 'railties'
+gem 'activesupport'
