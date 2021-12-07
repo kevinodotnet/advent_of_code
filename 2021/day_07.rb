@@ -36,9 +36,43 @@ class SolutionA
 end
 
 class SolutionB < SolutionA
+    def initialize(data)
+        super
+        @data = @data.sort
+        @cache = {}
+    end
+    def fuel_to_align_on(location)
+        @cache[location] ||= begin
+            fuel = 0
+            @data.each do |d|
+                steps = (location-d).abs
+                while steps > 0 do
+                    fuel += steps
+                    steps -= 1
+                end
+            end
+            fuel
+        end
+    end
+    def solve
+        location = @data[@data.count/2]
+        cache = {}
+        range = (@data.min..@data.max)
+        while range.include?(location) do
+            used_here = fuel_to_align_on(location)
+            if fuel_to_align_on(location-1) < used_here
+                location -= 1
+            elsif fuel_to_align_on(location+1) < used_here
+                location += 1
+            else
+                return used_here
+            end
+        end
+        raise StandardError, 'todo'
+    end
 end
 
-class SolutionATest < Minitest::Test
+class SolutionTest < Minitest::Test
     def test_toy1
         input = "1,2,3"
         assert_equal 3, SolutionA.new(input).fuel_to_align_on(1)
@@ -61,34 +95,19 @@ class SolutionATest < Minitest::Test
         [
             {
                 align_on: 2,
-                fuel_required: 37
+                fuel_required: 206
             },
             {
-                align_on: 1,
-                fuel_required: 41
+                align_on: 5,
+                fuel_required: 168
             },
-            {
-                align_on: 3,
-                fuel_required: 39
-            },
-            {
-                align_on: 10,
-                fuel_required: 71
-            }
         ].each do |scenario|
-            assert_equal scenario[:fuel_required], SolutionA.new(test_input).fuel_to_align_on(scenario[:align_on])
+            assert_equal scenario[:fuel_required], SolutionB.new(test_input).fuel_to_align_on(scenario[:align_on])
         end
-        
-    end
-end
-
-class SolutionBTest < Minitest::Test
-    def test_the_test_input
+        assert_equal 168, SolutionB.new(test_input).solve
     end
 end
 
 puts "##### Solution A #####"
 puts "full: #{SolutionA.new(input).solve}"
-# puts "##### Solution B #####"
-# puts "test: #{SolutionB.new(input).solve}"
-# puts "full: #{SolutionB.new(input).solve}"
+puts "full: #{SolutionB.new(input).solve}"
