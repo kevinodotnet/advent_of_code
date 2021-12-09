@@ -33,6 +33,7 @@ def input
 end
 
 class SolutionA
+    attr_accessor :patterns
     DIGITS = {
         d0: Set.new("abcefg".split("").map{|s| s.to_sym}),
         d1: Set.new("cf".split("").map{|s| s.to_sym}),
@@ -55,86 +56,90 @@ class SolutionA
             end
             {
                 samples: samples,
-                digits: digits
+                digits: digits,
+                result: solve_pattern(samples, digits)
             }
         end
     end
-    def solve_pattern(p, count_of)
-        #     0:      1:      2:      3:      4:
-        #     aaaa    ....    aaaa    aaaa    ....
-        #    b    c  .    c  .    c  .    c  b    c
-        #    b    c  .    c  .    c  .    c  b    c
-        #     ....    ....    dddd    dddd    dddd
-        #    e    f  .    f  e    .  .    f  .    f
-        #    e    f  .    f  e    .  .    f  .    f
-        #     gggg    ....    gggg    gggg    ....
-        
-        #      5:      6:      7:      8:      9:
-        #     aaaa    aaaa    aaaa    aaaa    aaaa
-        #    b    .  b    .  .    c  b    c  b    c
-        #    b    .  b    .  .    c  b    c  b    c
-        #     dddd    dddd    ....    dddd    dddd
-        #    .    f  e    f  .    f  e    f  .    f
-        #    .    f  e    f  .    f  e    f  .    f
-        #     gggg    gggg    ....    gggg    gggg
 
-        # DIGITS.map{|k,v| { k: k, v: v.count}}
-        # {:k=>:d1, :v=>2},
-        # {:k=>:d7, :v=>3},
-        # {:k=>:d4, :v=>4},
-        # {:k=>:d8, :v=>7},
-    
-        mapping = {} # wrong segment to correct segment
-        segments = {} # by digit, the segments that are actually lit up
+    def solve_pattern(samples, digits)
+        mapping = {}
+        segments = {}
+        p = {
+            samples: samples,
+            digits: digits
+        }
 
-        # 1 overlaps with 7, the extra one in :d7 is thus :a
-        segments[:d1] = p[:samples].detect{|s| s.count == 2}
-        segments[:d4] = p[:samples].detect{|s| s.count == 4}
-        segments[:d7] = p[:samples].detect{|s| s.count == 3}
-        segments[:d8] = p[:samples].detect{|s| s.count == 7}
+        segments[:d1] = samples.detect{|s| s.count == 2}
+        segments[:d4] = samples.detect{|s| s.count == 4}
+        segments[:d7] = samples.detect{|s| s.count == 3}
+        segments[:d8] = samples.detect{|s| s.count == 7}
+        segments.values.each{|s| samples = samples - [s]}
 
-        # d7 and d4 differ by :a only, so we can map
+        # use d4/7 to isolate :a
         mapping[:a] = (segments[:d7] - segments[:d1]).first
 
-        # use 5 segment digits to isolate :g
-        f = segments[:d8].dup
-        p[:samples].select{|s| s.count == 5}.each{|s| f = f & s}
-        f = f - Set.new([mapping.invert[:a]]) # remove :a leaving only :d:g
-        mapping[:g] = (f - segments[:d4]).first # use :d4 to remove :d, leaving :g
+        # d:9 == samples with count 6 that have only one diff.count from :d4
+        samples.select do |s|
+            next unless s.count == 6
+            remaining = (s - segments[:d4] - Set.new([mapping[:a]]))
+            next unless remaining.count == 1
+            segments[:d9] = s
+            raise StandardError if mapping[:g]
+            mapping[:g] = remaining.first
+        end
+        segments.values.each{|s| samples = samples - [s]}
 
-        # the union of [:d2, :d3, :d5] is [a/d/g]; then union D4 to isolate :d
-        # {:k=>:d2, :v=>5},
-        # {:k=>:d3, :v=>5},
-        # {:k=>:d5, :v=>5},
-        mapping[:d] = (p[:samples].select{|s| s.count == 5}.inject(DIGITS[:d8].dup){|f, s| f&s} & DIGITS[:d4]).first
+        # diff of :d & d:9 is :e
+        mapping[:e] = (segments[:d8] - segments[:d9]).first
+        d06 = samples.select{|s| s.count == 6}
 
-        # 7 and 4 is [:b, :d]
-        bd = (segments[:d4] - segments[:d7]).to_a
-        # only :d5 has [b,d] and also a count of 5
-        segments[:d5] = p[:samples].select{|s| s.include?(bd.first) && s.include?(bd.last) && s.count == 5}.first
-        
-        # now can isolate :f, then :c
-        mapping[:f] = (segments[:d5] & segments[:d1]).first
-        mapping[:c] = (segments[:d1] - Set.new([mapping[:f]])).first
+        # diff of d06; then minute :d1, yeilds :e
+        mapping[:d] = [d06.first - d06.last - segments[:d1], d06.last - d06.first - segments[:d1]].select{|a| a.count == 1}.first.first
+        raise StandardError unless d06.count == 2
+        d06.map do |d|
+            if (d + Set.new([mapping[:d]])).count == 7
+                # we found :d0
+                segments[:d0] = d
+            else
+                segments[:d6] = d
+            end
+        end
 
-        segments[:d3] = p[:samples].select{|s| s.count == 5 && s != segments[:d5] && s.include?(:f)}.first
-        segments[:d2] = p[:samples].select{|s| s.count == 5 && s != segments[:d5] && s.include?(:e)}.first
+        d235 = samples.select{|s| s.count == 5}
 
-        segments[:d6] = segments[:d8] - Set.new([mapping[:c]])
+        # get d2
+        mapped = Set.new(mapping.values)
+        d35 = nil
+        d235.each do |d| 
+            next unless (d - mapped).count == 1
+            mapping[:c] = (d - mapped).first
+            segments[:d2] = d
+            d35 = d235 - [d]
+        end
 
-        segments[:d0] = p[:samples].select{|s| s.count == 6 && s != segments[:d6] && !s.include?(mapping[:d])}.first
-        segments[:d9] = p[:samples].select{|s| s.count == 6 && s != segments[:d6] && s.include?(mapping[:d])}.first
+        mapped = Set.new(mapping.values)
+        d35.each do |d| 
+            next unless (d - mapped).count == 1
+            mapping[:f] = (d - mapped).first
+            segments[:d3] = d
+            segments[:d5] = (d35 - [d]).first
+        end
 
-        # In the output values, how many times do digits 1, 4, 7, or 8 appear?
-        r = p[:digits].map do |d|
-            count_of.include?(segments.invert[d]) ? 1 : 0
-        end.sum
-        r
+        mapping[:b] = (segments[:d8] - Set.new(mapping.values)).first
+
+        out_digits = digits.map do |d|
+            segments.invert[d].to_s.gsub('d','')
+        end.join('')
+
+        return {
+            segments: segments,
+            mapping: mapping,
+            digits: out_digits
+        }
     end
-    def solve(count_of)
-        @patterns.map do |p|
-            solve_pattern(p, count_of)
-        end.sum
+    def solve
+        @patterns.map{|p| p[:result][:digits].to_i}.sum
     end
 end
 
@@ -145,23 +150,23 @@ class SolutionATest < Minitest::Test
     def test_unscrambled
         all = SolutionA::DIGITS.values.map{|s| s.to_a.join("")}
         input = [all, "|", all].join(" ")
-        assert_equal 1, SolutionA.new(input).solve([:d0])
+        s = SolutionA.new(input)
+        assert_equal 10, s.patterns.first[:result][:segments].count
+        assert_equal 7, s.patterns.first[:result][:mapping].count
+        assert_equal "0123456789", s.patterns.first[:result][:digits]
     end
-    def test_digits_constant
-        assert_equal SolutionA::DIGITS.values.uniq.count, SolutionA::DIGITS.count
+    def test_part_2
+        s = SolutionA.new(test_input_1)
+        assert_equal 10, s.patterns.first[:result][:segments].count
+        assert_equal 7, s.patterns.first[:result][:mapping].count
+        assert_equal "5353", s.patterns.first[:result][:digits]
     end
-    def test_the_test_input_1
-        assert_equal 26, SolutionA.new(test_input_2).solve([:d1, :d4, :d7, :d8])
-    end
-end
-
-class SolutionBTest < Minitest::Test
-    def test_the_test_input
+    def test_part_2_input_2
+        s = SolutionA.new(test_input_2)
+        expected = ["8394","9781","1197","9361","4873","8418","4548","1625","8717","4315"]
+        assert_equal expected, s.patterns.map{|p| p[:result][:digits]}
     end
 end
 
 puts "##### Solution A #####"
-puts "full: #{SolutionA.new(input).solve([:d1, :d4, :d7, :d8])}
-# puts "##### Solution B #####"
-# puts "test: #{SolutionB.new(test_input).solve}"
-# puts "full: #{SolutionB.new(input).solve}"
+puts "full: #{SolutionA.new(input).solve}"
