@@ -24,27 +24,26 @@ end
 class SolutionA
     def initialize(data)
         @data = data.split("\n").map{|l| l.split("").map{|i| i.to_i}}
+        @xx = 0
     end
 
-    # puts @data.map{|r| r.join("")}.join("\n")
-
     def cols
-        cols = @data.map{|r| r.count}.max
+        @cols ||= @data.map{|r| r.count}.max
     end
 
     def rows
-        rows = @data.count
+        @rows ||= @data.count
     end
 
     def peers(x, y)
         p = []
         (-1..1).map do |dy|
             (-1..1).each do |dx|
-                next if dx.abs + dy.abs == 2
+                next unless dx.abs + dy.abs == 1
                 x1 = x + dx
                 y1 = y + dy
                 if (x1 >= 0 && y1 >= 0 && x1 < cols && y1 < rows)
-                    p << {x: x1, y: y1, h: @data[y1][x1]} unless x1 == x && y1 == y
+                    p << {x: x1, y: y1, h: @data[y1][x1]}
                 end
             end
         end
@@ -70,13 +69,14 @@ class SolutionA
     def basins
         low_points.map do |l|
             basin = Set.new([l])
-            cursor = Set.new
-            while cursor != basin do
+            new_points = [l]
+            while new_points.any? do
                 cursor = basin.dup
-                basin.each do |p|
+                new_points.each do |p|
                     new_points = peers(p[:x], p[:y]).select{|p| p[:h] < 9}
                     basin = basin + Set.new(new_points)
                 end
+                new_points = basin - cursor
             end
             basin
         end
