@@ -28,24 +28,34 @@ class SolutionA
 
     # puts @data.map{|r| r.join("")}.join("\n")
 
+    def cols
+        cols = @data.map{|r| r.count}.max
+    end
+
+    def rows
+        rows = @data.count
+    end
+
+    def peers(x, y)
+        p = []
+        (-1..1).map do |dy|
+            (-1..1).each do |dx|
+                next if dx.abs + dy.abs == 2
+                x1 = x + dx
+                y1 = y + dy
+                if (x1 >= 0 && y1 >= 0 && x1 < cols && y1 < rows)
+                    p << {x: x1, y: y1, h: @data[y1][x1]} unless x1 == x && y1 == y
+                end
+            end
+        end
+        p
+    end
+
     def low_points
         lowest = []
-        cols = @data.map{|r| r.count}.max
-        rows = @data.count
         (0...rows).each do |y|
             (0...cols).each do |x|
-                peers = []
-                (-1..1).map do |dy|
-                    (-1..1).each do |dx|
-                        x1 = x + dx
-                        y1 = y + dy
-                        if (x1 >= 0 && y1 >= 0 && x1 < cols && y1 < rows)
-                            peers << {x: x1, y: y1} unless x1 == x && y1 == y
-                        end
-                    end
-                end
-
-                lower = peers.map do |p|
+                lower = peers(x, y).map do |p|
                     @data[y][x] < @data[p[:y]][p[:x]]
                 end
 
@@ -57,6 +67,21 @@ class SolutionA
         lowest
     end
 
+    def basins
+        low_points.map do |l|
+            basin = Set.new([l])
+            cursor = Set.new
+            while cursor != basin do
+                cursor = basin.dup
+                basin.each do |p|
+                    new_points = peers(p[:x], p[:y]).select{|p| p[:h] < 9}
+                    basin = basin + Set.new(new_points)
+                end
+            end
+            basin
+        end
+    end
+
 end
 
 class SolutionB < SolutionA
@@ -66,7 +91,16 @@ class SolutionATest < Minitest::Test
     def test_the_test_input
         assert_equal 15, SolutionA.new(test_input).low_points.map{|p| p[:h] + 1}.sum
     end
+    def test_basins
+        s = SolutionA.new(test_input).basins
+        expected = [3,9,14,9]
+        assert_equal expected, s.map{|b| b.count{|s| s[:h]}}
+    end
+    def test_part2_input 
+        assert_equal 1023660, SolutionA.new(input).basins.map{|b| b.count}.sort.last(3).inject(:*)
+    end
 end
 
 puts "##### Solution A #####"
-puts "full: #{SolutionA.new(input).low_points.map{|p| p[:h] + 1}.sum}"
+puts "p1: #{SolutionA.new(input).low_points.map{|p| p[:h] + 1}.sum}"
+puts "p2: #{SolutionA.new(input).basins.map{|b| b.count}.sort.last(3).inject(:*)}"
