@@ -72,17 +72,29 @@ class SolutionTest < Minitest::Test
     end
 
     def test_part1
-        board = Board.new(Solution.input)
+        assert_equal 1681, Solution.part1
+    end
+
+    def test_part2_test_input
+        board = Board.new(test_input)
         boards = []
         at_step = 0
-        (1..100).each do |step|
+        (1..194).each do |step|
             while at_step < step 
-                board = board.step
-                boards << board
+                nb = board.step
+                boards << nb
+                board = nb
                 at_step += 1
             end
         end
-        assert_equal 1681, Solution.part1
+        nb = boards.last.step
+        
+        assert_equal [0], nb.data.flatten.uniq
+        assert boards.last.all_flashed?
+    end
+
+    def test_part2
+        assert_equal 276, Solution.part2
     end
 
     def longer_input_steps

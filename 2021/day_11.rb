@@ -26,6 +26,10 @@ class Board
         data.map{|r| r.join("")}.join("\n")
     end
 
+    def all_flashed?
+        @flashed.flatten.uniq == [1]
+    end
+
     def flash(y, x, nd)
         return unless nd[y][x] > 9
         return if @flashed[y][x]
@@ -93,10 +97,16 @@ class Solution
     end
 
     def self.part2
+        board = Board.new(Solution.input)
+        at_step = 0
+        while true do
+            nb = board.step
+            at_step += 1
+            return at_step if board.all_flashed?
+            board = nb
+        end
     end
 end
-
-
 
 puts "##### Solution #####"
 puts "part1: #{Solution.part1}"
