@@ -87,7 +87,7 @@ class SolutionTest < Minitest::Test
             fold along x=8
         EOF
         solution = Solution.parse(input)
-        assert_equal "#..#....", solution.fold.board_as_str
+        assert_equal "...#..#.".chomp, solution.fold.board_as_str.chomp
     end
 
     def test_non_middle_y

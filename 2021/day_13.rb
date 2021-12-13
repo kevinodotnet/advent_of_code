@@ -59,7 +59,7 @@ class Solution
             new_data = data.dup.map do |row|
                 left = row.dup.slice(0...this_fold[:at])
                 right = row.dup.slice((this_fold[:at]+1)...row.count)
-                left.zip(right.reverse).map{|m| m.compact.max}
+                left.reverse.zip(right).reverse.map{|m| m.compact.max}
             end
             Solution.new(new_data, remaining_folds)
         end
@@ -99,7 +99,7 @@ class Solution
 end
 
 puts "##### Solution #####"
-puts "part1: #{Solution.part1}"
+#puts "part1: #{Solution.part1}"
 puts "part2"
-puts "#{Solution.part2}"
+#puts "#{Solution.part2}"
 puts "####################"
