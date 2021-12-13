@@ -7,7 +7,17 @@ class SolutionTest < Minitest::Test
     end
 
     def test_part2
-        Solution.part2
+        expected = <<~EOF
+        #### ###  #    #  # ###  ###  #### #  # 
+        #    #  # #    #  # #  # #  # #    #  # 
+        ###  ###  #    #  # ###  #  # ###  #### 
+        #    #  # #    #  # #  # ###  #    #  # 
+        #    #  # #    #  # #  # # #  #    #  # 
+        #### ###  ####  ##  ###  #  # #    #  # 
+        EOF
+        expected = expected.chomp
+        actual = Solution.part2.chomp
+        assert_equal expected, actual
     end
 
     def sample_input_1
@@ -67,6 +77,38 @@ class SolutionTest < Minitest::Test
             }
         ]
         assert_equal expected, solution.folds
+    end
+
+    def test_non_middle_x
+        input = <<~EOF
+            10,0
+            3,0
+
+            fold along x=8
+        EOF
+        solution = Solution.parse(input)
+        assert_equal "#..#....", solution.fold.board_as_str
+    end
+
+    def test_non_middle_y
+        input = <<~EOF
+            0, 3
+            0, 10
+
+            fold along y=8
+        EOF
+        expected = <<~EOF
+            .
+            .
+            .
+            #
+            .
+            .
+            #
+            .
+        EOF
+        solution = Solution.parse(input)
+        assert_equal expected.chomp, solution.fold.board_as_str.chomp
     end
 
     def test_example_1_fold_1_and_2

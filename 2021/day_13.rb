@@ -46,22 +46,31 @@ class Solution
         this_fold = remaining_folds.shift
         if this_fold[:axis] == :y 
             top = data.dup.slice(0...this_fold[:at])
-            bottom_flipped = data.dup.slice(this_fold[:at]...data.count).reverse
-            top.each_with_index do |row, y|
-                row.each_with_index do |d, x|
-                    top[y][x] += bottom_flipped[y][x]
-                    top[y][x] > 1 ? top[y][x] = 1 : top[y][x]
+            bottom = data.dup.slice((this_fold[:at]+1)...data.count)
+            d = top.reverse.zip(bottom).reverse.map do |row_pair|
+                if row_pair.compact.count == 1
+                    row_pair.compact.first
+                else
+                    row_pair.first.zip(row_pair.last).map{|d| d.max}
                 end
             end
-            Solution.new(top, remaining_folds)
+            Solution.new(d, remaining_folds)
         else
             new_data = data.dup.map do |row|
                 left = row.dup.slice(0...this_fold[:at])
-                right_flipped = row.dup.slice((this_fold[:at]+1)...row.count).reverse
-                left.zip(right_flipped).map{|d| d.max}
+                right = row.dup.slice((this_fold[:at]+1)...row.count)
+                left.zip(right.reverse).map{|m| m.compact.max}
             end
             Solution.new(new_data, remaining_folds)
         end
+    end
+
+    def fold_all
+        final_solution = self
+        folds.each do |f|
+            final_solution = final_solution.fold
+        end
+        final_solution
     end
 
     def visible_count
@@ -83,10 +92,14 @@ class Solution
     end
 
     def self.part2
+        solution = Solution.parse(input)
+        solution = solution.fold_all
+        solution.board_as_str.gsub(/\./,' ')
     end
 end
 
 puts "##### Solution #####"
 puts "part1: #{Solution.part1}"
-#puts "part2: #{Solution.part2}"
+puts "part2"
+puts "#{Solution.part2}"
 puts "####################"
