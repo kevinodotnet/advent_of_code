@@ -16,29 +16,44 @@ class Solution
         end
     end
 
-    def routes
-        routes = [
-            ["start"]
-        ]
-        loop_again = true
-        while loop_again do
-            loop_again = false
-            new_routes = []
-            routes.each do |r|
-                if r.last == "end"
-                    new_routes << r
-                    next
-                end
-                @connections[r.last].keys.each do |k|
-                    next if r.include?(k) && is_lower?(k)
-                    new_route = [r, k].flatten
-                    loop_again = true
-                    new_routes << new_route
-                end
-            end
-            routes = new_routes
+    def routes(mode = 0)
+        small_rooms = if mode == 0
+            ["fake_room"]
+        else
+            (@connections.keys - ["start","end"]).map{|r| Solution.is_lower?(r) ? r : nil}.compact
         end
-        routes
+        result = small_rooms.map do |visit_twice|
+            loop_again = true
+            routes = [
+                ["start"]
+            ]
+            while loop_again do
+                loop_again = false
+                new_routes = []
+                routes.each do |r|
+                    if r.last == "end"
+                        new_routes << r
+                        next
+                    end
+                    @connections[r.last].keys.each do |k|
+                        next if k == "start"
+                        if r.include?(k) && Solution.is_lower?(k)
+                            times = r.select{|s| s == k}.count
+                            next if times >= 2
+                            next if times == 1 && visit_twice != k
+                        end
+                        new_route = [r, k].flatten
+                        loop_again = true
+                        new_routes << new_route
+                    end
+                end
+                routes = new_routes
+            end
+            routes
+        end
+        routes = [];
+        result.each{|r| routes = routes + r}
+        routes.uniq
     end
 
     def self.input
@@ -50,11 +65,12 @@ class Solution
     end
 
     def self.part2
+        Solution.new(input).routes(2).count
     end
 
     private
 
-    def is_lower?(s)
+    def self.is_lower?(s)
         s == s.downcase
     end
 end
