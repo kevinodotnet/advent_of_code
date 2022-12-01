@@ -6,16 +6,6 @@ class AbstractSolution
   def initialize(data:)
     @data = data
   end
-
-  def parse
-    @data.split("\n")
-  end
-
-  def part1
-  end
-
-  def part2
-  end
 end
 
 code_file = Dir["*"].select{|f| f.match(/^day_\d\d\.rb/)}.sort.last
