@@ -1,17 +1,23 @@
 class Sack
+  attr_reader :items
+
   def initialize(items)
     @items = items
   end
 
-  def common_priority
-    @priorities = {}
+  def self.priority(item)
+    priorities = {}
     (('a'..'z').to_a + ('A'..'Z').to_a).each_with_index do |c, i|
-      @priorities[c] = i+1
+      priorities[c] = i+1
     end
+    priorities[item]
+  end
+
+  def common_priority
     c1 = @items[0..(@items.length/2-1)].split("")
     c2 = @items[(@items.length/2)..].split("")
     common = (c1 & c2).first
-    @priorities[common]
+    Sack.priority(common)
   end
 end
 
@@ -25,6 +31,9 @@ class Solution < AbstractSolution
   end
 
   def part2
-    # parse
+    sacks = parse
+    sacks.each_slice(3).map do |group|
+      Sack.priority(group.map{|s| s.items.split("")}.inject(&:&).first)
+    end.sum
   end
 end
