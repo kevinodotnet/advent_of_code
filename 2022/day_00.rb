@@ -8,6 +8,6 @@ class Solution < AbstractSolution
   end
 
   def part2
-    parse
+    # parse
   end
 end
