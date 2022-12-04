@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
 require "pry"
+require "active_support"
+require "active_support/core_ext"
 
 class AbstractSolution
   def initialize(data:)

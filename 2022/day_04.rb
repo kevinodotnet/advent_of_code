@@ -10,6 +10,6 @@ class Solution < AbstractSolution
   end
 
   def part2
-    # parse
+    parse.select{|e1, e2| e1.overlaps?(e2)}.count
   end
 end
