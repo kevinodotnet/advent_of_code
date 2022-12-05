@@ -34,18 +34,29 @@ class Solution < AbstractSolution
     end
   end
 
-  def part1
-    parse
+  def apply_moves(group_move: )
     @moves.each do |m|
-      m[:count].times do
-        moving = @stacks[m[:move_from]].pop
-        @stacks[m[:move_to]].push(moving)
+      if group_move
+        moving = @stacks[m[:move_from]].pop(m[:count])
+        @stacks[m[:move_to]].push(*moving)
+      else
+        m[:count].times do
+          moving = @stacks[m[:move_from]].pop
+          @stacks[m[:move_to]].push(moving)
+        end
       end
     end
+  end
+
+  def part1
+    parse
+    apply_moves(group_move: false)
     @stacks.map{|k,v| v.last}.join("")
   end
 
   def part2
-    # parse
+    parse
+    apply_moves(group_move: true)
+    @stacks.map{|k,v| v.last}.join("")
   end
 end
