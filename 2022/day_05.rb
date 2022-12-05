@@ -36,15 +36,9 @@ class Solution < AbstractSolution
 
   def apply_moves(group_move: )
     @moves.each do |m|
-      if group_move
-        moving = @stacks[m[:move_from]].pop(m[:count])
-        @stacks[m[:move_to]].push(*moving)
-      else
-        m[:count].times do
-          moving = @stacks[m[:move_from]].pop
-          @stacks[m[:move_to]].push(moving)
-        end
-      end
+      moving = @stacks[m[:move_from]].pop(m[:count])
+      moving = moving.reverse unless group_move
+      @stacks[m[:move_to]].push(*moving)
     end
   end
 
