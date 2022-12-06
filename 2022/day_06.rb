@@ -3,17 +3,21 @@ class Solution < AbstractSolution
     @data.split("")
   end
 
-  def part1
+  def scan_marker(range)
     chars = parse
     chars.each_with_index do |v, i|
-      next if i < 4
-      next if chars[(i-4)..(i-1)].uniq.count < 4
+      next if i < range
+      next if chars[(i-range)..(i-1)].uniq.count < range
       return i
     end
     nil
   end
 
+  def part1
+    scan_marker(4)
+  end
+
   def part2
-    # parse
+    scan_marker(14)
   end
 end

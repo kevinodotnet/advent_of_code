@@ -10,6 +10,14 @@ class SolutionTest < Minitest::Test
         "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw" => 11
     }
 
+    PART2_INPUTS = {
+        "mjqjpqmgbljsphdztnvjfqwrcgsmlb" => 19,
+        "bvwbjplbgvbhsrlpgdmjqwftvncz" => 23,
+        "nppdvjthqldpwncqszvftbrmjlhg" => 23,
+        "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg" => 29,
+        "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw" => 26
+    }
+
     def test_part1
         OTHERS_INPUTS.each do |k,v|
             assert_equal v, Solution.new(data: k).part1
@@ -18,6 +26,9 @@ class SolutionTest < Minitest::Test
     end
 
     def test_part2
+        PART2_INPUTS.each do |k,v|
+            assert_equal v, Solution.new(data: k).part2
+        end
         # assert_equal 456, Solution.new(data: SAMPLE_INPUT).part2
     end
 end
