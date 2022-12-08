@@ -64,6 +64,17 @@ class Solution < AbstractSolution
   end
 
   def part2
-    # parse
+    parse
+
+    total = 70000000
+    used = @fs[:size]
+    free = total - used
+
+    dirs = []
+    scan(@fs) do |e|
+      dirs << e if e[:type] == :dir && e[:size] >= (30000000 - free)
+    end
+
+    dirs.sort_by { |h| h[:size]}.first[:size]
   end
 end

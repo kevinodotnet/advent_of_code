@@ -25,13 +25,18 @@ class SolutionTest < Minitest::Test
         7214296 k
     EOF
 
+    def real_input
+        day = __FILE__.match(/\d+/)
+        File.read("day_#{day}.input")
+    end
+
     def test_part1
         assert_equal 95437, Solution.new(data: SAMPLE_INPUT).part1
-        assert_equal 1543140, Solution.new(data: File.read("day_07.input")).part1
+        assert_equal 1543140, Solution.new(data: real_input).part1
     end
 
     def test_part2
-        # assert_equal 456, Solution.new(data: SAMPLE_INPUT).part2
-        # assert_equal 456, Solution.new(data: File.read("day_07.input")).part2
+        assert_equal 24933642, Solution.new(data: SAMPLE_INPUT).part2
+        assert_equal 1117448, Solution.new(data: real_input).part2
     end
 end
