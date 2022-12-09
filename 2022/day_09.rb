@@ -1,12 +1,8 @@
 require 'matrix'
 
 class Solution < AbstractSolution
-  attr_accessor :head, :tail
-
   def initialize(*)
     super
-    @head = Matrix[[0, 0]]
-    @tail = Matrix[[0, 0]]
   end
 
   def parse
@@ -14,13 +10,23 @@ class Solution < AbstractSolution
   end
 
   def move(vector)
-    @head = @head + vector
-    vector_t_to_h = @head - @tail
-    return if vector_t_to_h.to_a.first.map{|i| i.abs}.max <= 1 # is adjacent
-    @tail = @tail + Matrix[vector_t_to_h.to_a.first.map{|i| i == 0 ? 0 : i/i.abs}]
+    @rope[0] = @rope[0] + vector
+
+    @rope.each_with_index do |k, i|
+      next if i == 0
+
+      knot = @rope[i]
+      prev_knot = @rope[i-1]
+
+      vector_prev_to_knot = prev_knot - knot
+
+      next if vector_prev_to_knot.to_a.first.map{|i| i.abs}.max <= 1 # is adjacent
+      knot = knot + Matrix[vector_prev_to_knot.to_a.first.map{|i| i == 0 ? 0 : i/i.abs}]
+      @rope[i] = knot
+    end
   end
 
-  def part1
+  def solve
     parse
     vector = {
       "U" => Matrix[[0, 1]],
@@ -31,15 +37,27 @@ class Solution < AbstractSolution
     tail_touched = Set.new
     @moves.each do |m|
       m[1].times do |i|
-        tail_touched << @tail
+        tail_touched << @rope.last
         move(vector[m[0]])
       end
-      tail_touched << @tail
+      tail_touched << @rope.last
     end
     tail_touched.count
   end
 
+  def part1
+    @rope = []
+    2.times do
+      @rope << Matrix[[0, 0]]
+    end
+    solve
+  end
+
   def part2
-    # parse
+    @rope = []
+    10.times do
+      @rope << Matrix[[0, 0]]
+    end
+    solve
   end
 end

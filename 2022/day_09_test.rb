@@ -10,6 +10,17 @@ class SolutionTest < Minitest::Test
         R 2
     EOF
 
+    SAMPLE_INPUT_2 = <<~EOF
+        R 5
+        U 8
+        L 8
+        D 3
+        R 17
+        D 10
+        L 25
+        U 20
+    EOF
+
     def real_input
         day = __FILE__.match(/\d+/)
         File.read("day_#{day}.input")
@@ -22,7 +33,7 @@ class SolutionTest < Minitest::Test
     end
 
     def test_part2
-        # assert_equal 456, Solution.new(data: SAMPLE_INPUT).part2
-        # assert_equal 456, Solution.new(data: real_input).part2
+        assert_equal 36, Solution.new(data: SAMPLE_INPUT_2).part2
+        assert_equal 2449, Solution.new(data: real_input).part2
     end
 end
