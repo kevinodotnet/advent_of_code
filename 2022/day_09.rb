@@ -13,6 +13,13 @@ class Solution < AbstractSolution
     @moves = @data.split("\n").map{|m| m = m.split(" "); m[1] = m[1].to_i; m}
   end
 
+  def move(vector)
+    @head = @head + vector
+    vector_t_to_h = @head - @tail
+    return if vector_t_to_h.to_a.first.map{|i| i.abs}.max <= 1 # is adjacent
+    @tail = @tail + Matrix[vector_t_to_h.to_a.first.map{|i| i == 0 ? 0 : i/i.abs}]
+  end
+
   def part1
     parse
     vector = {
@@ -24,15 +31,10 @@ class Solution < AbstractSolution
     tail_touched = Set.new
     @moves.each do |m|
       m[1].times do |i|
-        begin
-          tail_touched << @tail
-          @head = @head + vector[m[0]]
-          vector_t_to_h = @head - @tail
-          next if vector_t_to_h.to_a.first.map{|i| i.abs}.max <= 1 # is adjacent
-          @tail = @tail + Matrix[vector_t_to_h.to_a.first.map{|i| i == 0 ? 0 : i/i.abs}]
-        ensure
-        end
+        tail_touched << @tail
+        move(vector[m[0]])
       end
+      tail_touched << @tail
     end
     tail_touched.count
   end
