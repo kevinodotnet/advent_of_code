@@ -8,6 +8,7 @@ class Solution < AbstractSolution
   end
 
   def part2
-    # parse
+    sum = 0
+    parse.map{|i| sum += i; sum}.find_index(-1) + 1
   end
 end
