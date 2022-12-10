@@ -3,9 +3,9 @@ class Solution < AbstractSolution
     @data.split("\n")
   end
 
-  def part1
+  def run_cpu
     x = 1
-    cycles = parse.map do |l|
+    parse.map do |l|
       if l == "noop"
         v = {
           cmd: l,
@@ -33,11 +33,20 @@ class Solution < AbstractSolution
         m
       end
     end.flatten
+  end
+
+  def part1
+    cycles = run_cpu
     strengths = cycles.map.with_index { |c, i| c[:during] * (i + 1) }
     strengths.map.with_index { |v, i| ((i+1) - 20) % 40 == 0 ? v : nil }.compact.sum
   end
 
   def part2
-    # parse
+    screen = (0..5).map { (0..39).map{nil} }
+    cycles = run_cpu
+    cycles.each_with_index do |c, i|
+      screen[i] = (c[:during]-1..c[:during]+1).include?((i) % 40)
+    end
+    puts screen.each_slice(40).map {|r| r.map{|v| v ? '#' : '.'}.join("")}.join("\n")
   end
 end
