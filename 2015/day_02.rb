@@ -11,6 +11,10 @@ class Solution < AbstractSolution
   end
 
   def part2
-    # parse
+    parse.map do |l,w,h|
+      p = [l+w, w+h, h+l].min * 2
+      v = l * w * h
+      p + v
+    end.sum
   end
 end
