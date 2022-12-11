@@ -40,7 +40,17 @@ class SolutionTest < Minitest::Test
     end
 
     def test_part2
-        # assert_equal 456, Solution.new(data: SAMPLE_INPUT).part2
-        # assert_equal 456, Solution.new(data: real_input).part2
+        assert_equal 99 * 103, Solution.new(data: SAMPLE_INPUT).solve(20, false)
+        assert_equal 5204 * 5192, Solution.new(data: SAMPLE_INPUT).solve(1000, false)
+        assert_equal 10419 * 10391, Solution.new(data: SAMPLE_INPUT).solve(2000, false)
+        assert_equal 15638 * 15593, Solution.new(data: SAMPLE_INPUT).solve(3000, false)
+        assert_equal 20858 * 20797, Solution.new(data: SAMPLE_INPUT).solve(4000, false)
+        assert_equal 26075 * 26000, Solution.new(data: SAMPLE_INPUT).solve(5000, false)
+        assert_equal 31294 * 31204, Solution.new(data: SAMPLE_INPUT).solve(6000, false)
+        assert_equal 36508 * 36400, Solution.new(data: SAMPLE_INPUT).solve(7000, false)
+        assert_equal 41728 * 41606, Solution.new(data: SAMPLE_INPUT).solve(8000, false)
+        assert_equal 46945 * 46807, Solution.new(data: SAMPLE_INPUT).solve(9000, false)
+        assert_equal 52166 * 52013, Solution.new(data: SAMPLE_INPUT).solve(10000, false)
+        assert_equal 1, Solution.new(data: real_input).part2
     end
 end
