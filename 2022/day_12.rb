@@ -46,14 +46,10 @@ class Solution < AbstractSolution
     locations = [end_loc]
 
     while l = locations.shift
-      # puts "locations: #{locations}"
-      # puts "l: #{l}"
       locations += peers(l).select do |c|
-        # set cost of peer
         was_nil = c[:cost].nil?
         c[:cost] ||= l[:cost] + 1
         c[:cost] = l[:cost] + 1 if c[:cost] > l[:cost]
-        # break if c[:y] == @start_at[0] && c[:x] == @start_at[1]
         was_nil
       end
     end
