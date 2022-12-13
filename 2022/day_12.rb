@@ -38,7 +38,7 @@ class Solution < AbstractSolution
     end
   end
 
-  def part1
+  def solve
     parse
     end_loc = @board[@end_at[0]][@end_at[1]]
     end_loc[:cost] = 0
@@ -57,9 +57,15 @@ class Solution < AbstractSolution
         was_nil
       end
     end
+  end
+
+  def part1
+    solve
     @board[@start_at[0]][@start_at[1]][:cost]
   end
 
   def part2
+    solve
+    @board.flatten.select{|c| c[:h] == 0 && c[:cost]}.sort_by{|c| c[:cost]}.first[:cost]
   end
 end
