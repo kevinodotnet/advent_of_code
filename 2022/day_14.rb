@@ -55,10 +55,11 @@ class Solution < AbstractSolution
   end
 
   def best_destination(p)
-    destination = [[1, 0], [1, -1], [1, 1]].reject do |delta|
-      @board[p + Matrix[delta]]
-    end.first
-    p + Matrix[destination] if destination
+    [[1, 0], [1, -1], [1, 1]].each do |delta|
+      m = p + Matrix[delta]
+      return m unless @board[m]
+    end
+    nil
   end
 
   def drop_sand(p)
@@ -70,7 +71,7 @@ class Solution < AbstractSolution
         return :infinity
       end
       p = destination
-      @board[destination] = 'o'
+      @board[p] = 'o'
     end
     p
   end
