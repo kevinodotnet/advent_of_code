@@ -63,17 +63,18 @@ class Solution < AbstractSolution
   end
 
   def drop_sand(p)
-    @board[p] = 'o' # drop the sand
+    avail = p
+    destination = best_destination(p)
 
-    while (destination = best_destination(p))
-      @board[p] = nil
+    while destination
       if destination[0,0] >= @max_line_y
         return :infinity
       end
-      p = destination
-      @board[p] = 'o'
+      avail = destination
+      destination = best_destination(avail)
     end
-    p
+    @board[avail] = 'o'
+    avail
   end
 
   def part1
