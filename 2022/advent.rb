@@ -3,6 +3,7 @@
 require "pry"
 require "active_support"
 require "active_support/core_ext"
+require "benchmark"
 
 class AbstractSolution
   def initialize(data:)
@@ -27,8 +28,13 @@ elsif ARGV.last == "test"
   load test_file
 else
   solution = Solution.new(data: File.read(input_file))
+  results = {}
   puts "#" * 100
-  puts "Part1: #{solution.part1}"
-  puts "Part2: #{solution.part2}"
+  Benchmark.bm do |x|
+    x.report(:part1) { results[:part1] = solution.part1 }
+    x.report(:part2) { results[:part2] = solution.part2 }
+  end
+  puts "#" * 100
+  puts results
   puts "#" * 100
 end
