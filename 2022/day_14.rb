@@ -2,14 +2,14 @@ require 'matrix'
 
 class Solution < AbstractSolution
   def parse
+    @board = {} # key: [y,x] tuple; value: occupied_by (string) or nil (empty)
     @data.split("\n").map do |l|
       l.split(" -> ").map{|p| p.split(",").map(&:to_i).reverse}
     end
   end
 
-  def populate_board
-    @board = {} # key: [y,x] tuple; value: occupied_by (string) or nil (empty)
-    parse.each do |l|
+  def populate_board(lines, c = '#')
+    lines.each do |l|
       l.each.with_index do |p_to, i|
         next if i == 0
         p_from = l[i-1]
@@ -24,7 +24,7 @@ class Solution < AbstractSolution
           (dx.abs+1).times do |x|
             delta = Matrix[[y * y_dir,x * x_dir]]
             point = start_at + delta
-            @board[point] = '#'
+            @board[point] = c
           end
         end
       end
@@ -33,7 +33,7 @@ class Solution < AbstractSolution
   end
 
   def occupied
-    @board.select{|k, v| v}
+    @board.select{|k, v| v != 'F' && v}
   end
 
   def display
@@ -43,7 +43,7 @@ class Solution < AbstractSolution
     min_x = occupied.keys.map{|m| m[0,1]}.min
     max_x = occupied.keys.map{|m| m[0,1]}.max
     (min_y..max_y).each do |y|
-      print "#{y} "
+      print "#{y}\t"
       (min_x..max_x).each do |x|
         print @board[Matrix[[y, x]]] ? @board[Matrix[[y, x]]] : '.'
       end
@@ -51,6 +51,7 @@ class Solution < AbstractSolution
     end
     puts "sand count: #{occupied.values.count{|c| c=="o"}}"
     puts ""
+    # binding.pry
   end
 
   def best_destination(p)
@@ -61,7 +62,7 @@ class Solution < AbstractSolution
   end
 
   def drop_sand(p)
-    @board[p] = '+' # drop the sand
+    @board[p] = 'o' # drop the sand
 
     while (destination = best_destination(p))
       @board[p] = nil
@@ -75,7 +76,7 @@ class Solution < AbstractSolution
   end
 
   def part1
-    populate_board
+    populate_board(parse)
     while true
       stopped_at = drop_sand(Matrix[[0, 500]])
       # display
@@ -85,6 +86,21 @@ class Solution < AbstractSolution
   end
 
   def part2
-    # parse
+    lines = parse
+    populate_board(lines)
+    floor_y = @max_line_y + 2
+    lines = [
+      [
+        [floor_y, -1000],
+        [floor_y, 1000],
+      ]
+    ]
+    populate_board(lines, 'F')
+    while true
+      stopped_at = drop_sand(Matrix[[0, 500]])
+      # display
+      break if stopped_at == Matrix[[0, 500]]
+    end
+    occupied.values.select{|c| c=='o'}.count
   end
 end
