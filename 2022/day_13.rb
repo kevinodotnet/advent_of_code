@@ -2,7 +2,7 @@ class Solution < AbstractSolution
   def parse
     @data.split("\n\n").map do |l|
       l.split("\n").map do |c|
-        eval(c)
+        JSON.parse(c)
       end
     end
   end
