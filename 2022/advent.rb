@@ -4,6 +4,7 @@ require "pry"
 require "active_support"
 require "active_support/core_ext"
 require "benchmark"
+require "matrix"
 
 class AbstractSolution
   def initialize(data:)
