@@ -23,7 +23,7 @@ class SolutionTest < Minitest::Test
     end
 
     def test_part2
-        # assert_equal 456, Solution.new(data: SAMPLE_INPUT).part2
-        # assert_equal 456, Solution.new(data: real_input).part2
+        assert_equal 1707, Solution.new(data: SAMPLE_INPUT).part2
+        assert_equal 2261, Solution.new(data: real_input).part2
     end
 end

@@ -63,6 +63,23 @@ class Solution < AbstractSolution
   end
 
   def part2
-    # parse
+    parse
+    memo = Set.new
+    r = @good_valves.keys.count.times.map { |i| @good_valves.keys.combination(i).to_a }.map do |c|
+      c.map do |s|
+        for_helper = Set.new(s)
+        for_elf = Set.new(@good_valves.keys) - for_helper
+        key = [
+          for_elf.to_a.sort.join(","),
+          for_helper.to_a.sort.join(","),
+        ].sort.join("|")
+        next if memo.include?(key)
+        memo.add(key)
+        elf_released = solve(pos: :AA, prev: :AA, step: 26, rate: 0, released: 0, unvisited: for_elf, visited: [], frames: [])
+        helper_released = solve(pos: :AA, prev: :AA, step: 26, rate: 0, released: 0, unvisited: for_helper, visited: [], frames: [])
+        elf_released + helper_released
+      end
+    end
+    r.flatten.compact.max
   end
 end
