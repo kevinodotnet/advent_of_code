@@ -5,6 +5,8 @@ require "active_support"
 require "active_support/core_ext"
 require "benchmark"
 require "matrix"
+require "rgl/adjacency"
+require "rgl/dijkstra"
 
 class AbstractSolution
   def initialize(data:)
