@@ -17,18 +17,27 @@ class Solution < AbstractSolution
       [ 1, 0, 0]
     ].map do |p|
       pc = c.zip(p).map(&:sum)
-      @space.include?(pc) ? pc : nil
-    end.compact
+    end
   end
 
   def part1
     parse
     @cubes.sum do |c|
-      6 - peers(c).count
+      6 - peers(c).select{|pc| @space.include?(pc)}.count
     end
   end
 
+  def air_pocket?(c)
+    peers(c).count{|pc| @space.include?(pc)} == 6
+  end
+
   def part2
-    # parse
+    parse
+    @cubes.sum do |c|
+      # max
+      area = 6
+      # less sides adjacent to other droplets; or air pockets
+      area -= peers(c).select{|pc| @space.include?(pc) || air_pocket?(pc)}.count
+    end
   end
 end
