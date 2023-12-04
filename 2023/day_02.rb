@@ -19,7 +19,7 @@ class Solution < AbstractSolution
   end
 
   def part1(input)
-    result = parse.map do |g, rounds|
+    parse.map do |g, rounds|
       [
         g,
         rounds.map do |r|
@@ -32,6 +32,19 @@ class Solution < AbstractSolution
   end
 
   def part2
-    parse
+    parse.map do |g, rounds|
+      min = {
+      }
+      rounds.map do |r|
+        r.map do |color, count|
+          min[color] = if min[color]
+            min[color] > count ? min[color] : count
+          else
+            count
+          end
+        end
+      end
+      min.values.inject(:*)
+    end.sum
   end
 end
