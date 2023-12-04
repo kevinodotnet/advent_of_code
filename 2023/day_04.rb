@@ -8,6 +8,7 @@ class Solution < AbstractSolution
       numbers = Set.new(numbers)
       {
         card: card_num,
+        count: 1,
         numbers: numbers,
         winners: winners,
         matches: winners.intersection(numbers)
@@ -33,6 +34,15 @@ class Solution < AbstractSolution
   end
 
   def part2
-    parse
+    parse.each_with_index do |c, i|
+      matches = c[:matches].count
+      c[:count].times do
+        matches.times do |t|
+          t = t + 1
+          @data[i + t][:count] += 1
+        end
+      end
+    end
+    @data.sum{|c| c[:count]}
   end
 end
