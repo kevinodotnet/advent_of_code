@@ -61,5 +61,14 @@ class Solution < AbstractSolution
 
   def part2
     parse
+    result = @data.each_with_index.map do |r, y|
+      r.each_with_index.map do |c, x|
+        next unless c == "*"
+        ratios = peers(y, x).select{|p| p[:c].match?(/\d/)}.map{|p| number_at(p[:y], p[:x])}.uniq
+        next unless ratios.count == 2
+        ratios.map{|r| r[:n]}.inject(:*)
+      end
+    end
+    result.flatten.compact.sum
   end
 end

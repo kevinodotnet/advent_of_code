@@ -23,11 +23,11 @@ class SolutionTest < Minitest::Test
         expected = {y: 0, x: 0, n: 467}
         assert_equal expected, s.number_at(0, 2)
         assert_equal 4361, Solution.new(data: SAMPLE_INPUT).part1
-        assert_equal 123, Solution.new(data: real_input).part1
+        assert_equal 550934, Solution.new(data: real_input).part1
     end
 
     def test_part2
-        # assert_equal 456, Solution.new(data: SAMPLE_INPUT).part2
-        # assert_equal 456, Solution.new(data: real_input).part2
+        assert_equal 467835, Solution.new(data: SAMPLE_INPUT).part2
+        assert_equal 81997870, Solution.new(data: real_input).part2
     end
 end
