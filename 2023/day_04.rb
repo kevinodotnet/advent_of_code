@@ -11,7 +11,7 @@ class Solution < AbstractSolution
         count: 1,
         numbers: numbers,
         winners: winners,
-        matches: winners.intersection(numbers)
+        matches: winners & numbers
       }
     end
   end
@@ -19,18 +19,8 @@ class Solution < AbstractSolution
   def part1
     parse.each do |c|
       count = c[:matches].count
-      score = if count <= 1
-        count
-      else
-        i = 1
-        (count-1).times do
-          i = i * 2
-        end
-        i
-      end
-      c[:score] = score
-    end
-    @data.sum{|c| c[:score]}
+      c[:score] = count == 0 ? 0 : 2 ** (count-1)
+    end.sum{|c| c[:score]}
   end
 
   def part2
@@ -38,11 +28,10 @@ class Solution < AbstractSolution
       matches = c[:matches].count
       c[:count].times do
         matches.times do |t|
-          t = t + 1
+          t += 1
           @data[i + t][:count] += 1
         end
       end
-    end
-    @data.sum{|c| c[:count]}
+    end.sum{|c| c[:count]}
   end
 end
