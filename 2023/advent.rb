@@ -25,19 +25,8 @@ if ARGV.last == "newday"
   FileUtils.cp("day_00.rb", "day_#{newday}.rb")
   FileUtils.cp("day_00_test.rb", "day_#{newday}_test.rb")
   FileUtils.touch("day_#{newday}.input")
-elsif ARGV.last == "test"
+else
   require "minitest/autorun"
   require "minitest/focus"
   load test_file
-else
-  solution = Solution.new(data: File.read(input_file))
-  results = {}
-  puts "#" * 100
-  Benchmark.bm do |x|
-    x.report(:part1) { results[:part1] = solution.part1 }
-    x.report(:part2) { results[:part2] = solution.part2 }
-  end
-  puts "#" * 100
-  puts results
-  puts "#" * 100
 end
