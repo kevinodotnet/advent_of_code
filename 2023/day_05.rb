@@ -101,6 +101,7 @@ class Solution < AbstractSolution
           ranges = ranges.map do |r|
             transform_range_via_map(r, m)
           end.flatten
+          # binding.pry if 0 == ranges.sort{|a, b| a.first <=> b.first}.first.first
         end
       end
 
