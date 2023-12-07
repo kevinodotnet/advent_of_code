@@ -45,32 +45,68 @@ class SolutionTest < Minitest::Test
         assert_equal 650599855, Solution.new(data: real_input).part1
     end
 
-    def test_transform_range_via_map
+    def test_transform_range_via_map1
         s = Solution.new(data: SAMPLE_INPUT)
         s.parse
 
         expected = [(81..95)]
-        assert_equal expected, s.transform_range_via_map(79..93, {:src=>50, :dest=>52, :range=>50..97, :size=>48})
+        assert_equal expected, s.transform_range_via_map(79..93, {:src=>50, :dest=>52, :size=>48})
+    end
+
+    def test_transform_range_via_map1
+        s = Solution.new(data: SAMPLE_INPUT)
+        s.parse
 
         expected = [(10..20)]
-        assert_equal expected, s.transform_range_via_map(10..20, {:src=>50, :dest=>52, :range=>50..97, :size=>48})
+        assert_equal expected, s.transform_range_via_map(10..20, {:src=>50, :dest=>52, :size=>48})
+    end
+
+    #focus
+    def test_transform_range_via_map1
+        s = Solution.new(data: SAMPLE_INPUT)
+        s.parse
 
         expected = [
             (40..49),
             (100..101),
             (52..60),
         ]
-        assert_equal expected, s.transform_range_via_map(40..60, {:src=>50, :dest=>100, :range=>50..51, :size=>2})
+        assert_equal expected, s.transform_range_via_map(40..60, {:src=>50, :dest=>100, :size=>2})
+    end
 
+    #focus
+    def test_transform_range_via_map2
+        s = Solution.new(data: SAMPLE_INPUT)
+        s.parse
         expected = [
             (110..119),
-            (50..60)
+            (30..30)
         ]
-        assert_equal expected, s.transform_range_via_map(40..60, {:src=>30, :dest=>100, :range=>30..49, :size=>20})
+        assert_equal expected, s.transform_range_via_map(20..30, {:src=>10, :dest=>100, :size=>20})
+    end
+
+    def test_transform_range_via_map3
+        s = Solution.new(data: SAMPLE_INPUT)
+        s.parse
+            expected = [
+            (40..59),
+            (100..100)
+        ]
+        assert_equal expected, s.transform_range_via_map(40..60, {:src=>60, :dest=>100, :size=>20})
+    end
+
+    def test_transform_range_via_map4
+        s = Solution.new(data: SAMPLE_INPUT)
+        s.parse
+            expected = [
+            (119..119),
+            (80..80)
+        ]
+        assert_equal expected, s.transform_range_via_map(79..80, {:src=>60, :dest=>100, :size=>20})
     end
 
     def test_part2
-        #assert_equal 46, Solution.new(data: SAMPLE_INPUT).part2
+        assert_equal 46, Solution.new(data: SAMPLE_INPUT).part2
         assert_equal 456, Solution.new(data: real_input).part2
     end
 end
