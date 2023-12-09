@@ -153,7 +153,80 @@ class SolutionTest < Minitest::Test
 
     def test_part2
         assert_equal 46, Solution.new(data: SAMPLE_INPUT).part2
-        assert_equal "not 1549152", Solution.new(data: real_input).part2
+        # refute_equal 1549152, Solution.new(data: real_input).part2
+    end
+
+    def test_same_size_no_intersection
+        expected = [
+            10..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 100,
+                :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    def test_same_size_map_after_range_but_touches
+        expected = [
+            10..19,
+            200..200
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 20,
+                :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    def test_same_size_map_after_range_overlaps_more
+        expected = [
+            10..16,
+            200..203
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 17,
+                :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    def test_same_size_map_after_range_overlaps_but_one
+        expected = [
+            10..10,
+            200..209
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 11,
+                :dest => 200,
+                :size => 100
+            }
+        )
+    end
+
+    def test_same_size_map_at_range
+        expected = [
+            200..210
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 10,
+                :dest => 200,
+                :size => 100
+            }
+        )
     end
 
     private

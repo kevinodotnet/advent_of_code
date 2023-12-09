@@ -71,11 +71,11 @@ class Solution < AbstractSolution
       r2 = if m[:range].include?(r1)
         [m[:range].last, r.last].min
       else
-        # binding.pry if [m[:range].first-1, r.last].select{|o| o > r1}.empty?
-        [m[:range].first-1, r.last].select{|o| o > r1 || o == r.last}.min
+        # binding.pry
+        [m[:range].first-1, r.last].select{|o| o >= r1 || o == r.last}.min
       end
       ranges << (r1..r2)
-      #binding.pry
+      # binding.pry
       break if r2 == r.last
       if r1 == r2
         r1 += 1
@@ -84,6 +84,8 @@ class Solution < AbstractSolution
       end
       r2 = nil
     end
+
+    # binding.pry
 
     result = ranges.map{|r| m[:range].cover?(r) ? transform_range_via_map(r, m) : r}.flatten
 
