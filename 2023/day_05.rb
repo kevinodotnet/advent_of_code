@@ -52,7 +52,7 @@ class Solution < AbstractSolution
   # PART 2
   #
 
-  def transform_range_via_map(r, m)
+  def transform_range_via_map(r, m, expect_no_chunking: false)
     # r: a range of seeds that need to be mapped to one or more resulting ranges
     #    example: 105..1000, inclusive!
     #
@@ -81,35 +81,57 @@ class Solution < AbstractSolution
       ]
     end
 
+    binding.pry if expect_no_chunking # this would be a surprise at this point
+
     #
-    #
+    # the range and the mapping intersect somehow, but a portion of the range
+    # is not covered by the map, so multiple ranges will be returned, corresponding
+    # to the parts that pass through unmodified, or are shifted
     #
 
-    # case: partial overlap
-    # split (r) into sub-ranges that align to above cases, then go recursive
+    #
+    # start at the beginning of the seed range and "chunk" resulting ranges depending
+    # on if the chunk intersects with the mapping or not, until the seed range is
+    # exhausted
+    #
+
     ranges = []
     r1 = r.first
     r2 = nil
     loop do
       r2 = if m[:range].include?(r1)
-        [m[:range].last, r.last].min
+        # the chunk starts (r1) within the mapping
+        # set r2 to be the end of the seed range, or the end of the map, which ever comes first
+        [
+          m[:range].last,
+          r.last
+        ].min
       else
-        [m[:range].first-1, r.last].select{|o| o >= r1 || o == r.last}.min
-      end
-      ranges << (r1..r2)
+        # the chunk starts (r1) outside of the mapping (before or after, not sure)
+        # set r2 to be one before the start of the mapping, or the end of the seed range, which ever comes first
+        # ... but only for values larger than the current r1 chunk start
 
-      break if r2 == r.last
-      if r1 == r2
-        r1 += 1
-      else
-        r1 = r2 + 1
+        [
+          m[:range].first-1,
+          r.last
+        ].select do |o|
+          o >= r1
+        end.min
       end
+      ranges << (r1..r2) # produce a chunk
+
+      break if r2 == r.last # end of chunk processing
+
+      r1 = r2 + 1 # step to after the chunk, and go again
       r2 = nil
     end
 
-    result = ranges.map{|r| m[:range].cover?(r) ? transform_range_via_map(r, m) : r}.flatten
-
-    result
+    # the original single range [r] has been chunked into multiple ranges which should either
+    # intersect perfectly with the mapping, or not intersect at all. Go recursive to use the
+    # "pass-thru" or "shift" use cases as needed
+    ranges.map do |r|
+      transform_range_via_map(r, m, expect_no_chunking: true)
+    end.flatten
   end
 
   def part2
