@@ -10,6 +10,15 @@ class Solution < AbstractSolution
     end
   end
 
+  def parse2
+    @races = [
+      {
+        time: @data.split("\n").first.gsub(/ */, '').scan(/\d+/).map{|i| i.to_i}.first,
+        distance: @data.split("\n").last.gsub(/ */, '').scan(/\d+/).map{|i| i.to_i}.first,
+      }
+    ]
+  end
+
   def boat_distance(hold_time, race_duration)
     move_time = race_duration - hold_time
     speed = hold_time
@@ -21,8 +30,7 @@ class Solution < AbstractSolution
     distance
   end
 
-  def part1
-    parse
+  def run_races
     @races.map do |r|
       r[:variants] = (1..(r[:time]-1)).map do |hold_time|
         distance = boat_distance(hold_time, r[:time])
@@ -33,10 +41,17 @@ class Solution < AbstractSolution
         }
       end.compact
     end
+  end
+
+  def part1
+    parse
+    run_races
     @races.map{|r| r[:variants].count}.inject(:*)
   end
 
   def part2
-    parse
+    parse2
+    run_races
+    @races.map{|r| r[:variants].count}.inject(:*)
   end
 end
