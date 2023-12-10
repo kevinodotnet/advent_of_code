@@ -61,7 +61,6 @@ class SolutionTest < Minitest::Test
         assert_equal expected, s.transform_range_via_map(10..20, {:src=>50, :dest=>52, :size=>48})
     end
 
-    #focus
     def test_transform_range_via_map1c
         s = Solution.new(data: SAMPLE_INPUT)
         s.parse
@@ -74,7 +73,6 @@ class SolutionTest < Minitest::Test
         assert_equal expected, s.transform_range_via_map(40..60, {:src=>50, :dest=>100, :size=>2})
     end
 
-    #focus
     def test_transform_range_via_map2d
         s = Solution.new(data: SAMPLE_INPUT)
         s.parse
@@ -156,6 +154,10 @@ class SolutionTest < Minitest::Test
         # refute_equal 1549152, Solution.new(data: real_input).part2
     end
 
+    #
+    # test_same_size
+    #
+
     def test_same_size_no_intersection
         expected = [
             10..20
@@ -210,7 +212,7 @@ class SolutionTest < Minitest::Test
             {
                 :src  => 11,
                 :dest => 200,
-                :size => 100
+                :size => 11
             }
         )
     end
@@ -224,7 +226,533 @@ class SolutionTest < Minitest::Test
             {
                 :src  => 10,
                 :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    def test_same_size_map_before_range_by_one
+        expected = [
+            201..210,
+            20..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 9,
+                :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    def test_same_size_map_before_range_by_two
+        expected = [
+            202..210,
+            19..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 8,
+                :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    def test_same_size_map_before_range_all_but_two
+        expected = [
+            208..210,
+            13..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 2,
+                :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    def test_same_size_map_before_range_all_but_one
+        expected = [
+            209..210,
+            12..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 1,
+                :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    def test_same_size_map_before_range_touching
+        expected = [
+            210..210,
+            11..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 0,
+                :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    def test_same_size_map_before_range_not_touching
+        expected = [
+            10..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => -10,
+                :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    #
+    # test_map_bigger
+    #
+
+    def test_map_bigger_no_intersection
+        expected = [
+            10..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 100,
+                :dest => 200,
                 :size => 100
+            }
+        )
+    end
+
+    def test_map_bigger_map_after_range_but_touches
+        expected = [
+            10..19,
+            200..200
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 20,
+                :dest => 200,
+                :size => 100
+            }
+        )
+    end
+
+    def test_map_bigger_map_after_range_overlaps_more
+        expected = [
+            10..16,
+            200..203
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 17,
+                :dest => 200,
+                :size => 100
+            }
+        )
+    end
+
+    def test_map_bigger_map_after_range_overlaps_but_one
+        expected = [
+            10..10,
+            200..209
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 11,
+                :dest => 200,
+                :size => 100
+            }
+        )
+    end
+
+    def test_map_bigger_map_at_range
+        expected = [
+            200..210
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 10,
+                :dest => 200,
+                :size => 100
+            }
+        )
+    end
+
+    def test_map_bigger_map_before_range_by_one
+        expected = [
+            201..211,
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 9,
+                :dest => 200,
+                :size => 100
+            }
+        )
+    end
+
+    def test_map_bigger_map_before_range_by_two
+        expected = [
+            202..212,
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 8,
+                :dest => 200,
+                :size => 100
+            }
+        )
+    end
+
+    def test_map_bigger_map_before_range_not_touching
+        expected = [
+            10..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => -1000,
+                :dest => 200,
+                :size => 100
+            }
+        )
+    end
+
+    #
+    # test_map_smaller
+    #
+
+    def test_map_smaller_no_intersection
+        expected = [
+            10..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 100,
+                :dest => 200,
+                :size => 5
+            }
+        )
+    end
+
+    def test_map_smaller_map_after_range_but_touches
+        expected = [
+            10..19,
+            200..200
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 20,
+                :dest => 200,
+                :size => 5
+            }
+        )
+    end
+
+    def test_map_smaller_map_after_range_overlaps_more
+        expected = [
+            10..16,
+            200..203
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 17,
+                :dest => 200,
+                :size => 5
+            }
+        )
+    end
+
+    def test_map_smaller_map_after_range_overlaps_but_one
+        expected = [
+            10..10,
+            200..204,
+            16..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 11,
+                :dest => 200,
+                :size => 5
+            }
+        )
+    end
+
+    def test_map_smaller_map_at_range
+        expected = [
+            200..204,
+            15..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 10,
+                :dest => 200,
+                :size => 5
+            }
+        )
+    end
+
+    def test_map_smaller_map_before_range_not_touching
+        expected = [
+            10..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => -10,
+                :dest => 200,
+                :size => 5
+            }
+        )
+    end
+
+    #
+    # range.size = 1
+    #
+
+    def test_range_size_one_map_before_touches
+        expected = [
+            210..210
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..10,
+            {
+                :src  => 0,
+                :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    def test_range_size_one_map_overlaps
+        expected = [
+            205..205
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..10,
+            {
+                :src  => 5,
+                :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    def test_range_size_one_map_after_touches
+        expected = [
+            200..200
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..10,
+            {
+                :src  => 10,
+                :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    #
+    # map_size_one
+    #
+
+    def test_map_size_one_at_range_0
+        expected = [
+            200..200,
+            11..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 10,
+                :dest => 200,
+                :size => 1
+            }
+        )
+    end
+
+    def test_map_size_one_at_range_1
+        expected = [
+            10..10,
+            200..200,
+            12..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 11,
+                :dest => 200,
+                :size => 1
+            }
+        )
+    end
+
+    def test_map_size_one_at_range_last_minus_1
+        expected = [
+            10..18,
+            200..200,
+            20..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 19,
+                :dest => 200,
+                :size => 1
+            }
+        )
+    end
+
+    def test_map_size_one_at_range_last
+        expected = [
+            10..19,
+            200..200,
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 20,
+                :dest => 200,
+                :size => 1
+            }
+        )
+    end
+
+    #
+    # range.size = 2
+    #
+
+    def test_range_size_two_map_before_touches
+        expected = [
+            210..210,
+            11..11
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..11,
+            {
+                :src  => 0,
+                :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    def test_range_size_two_map_overlaps
+        expected = [
+            205..206
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..11,
+            {
+                :src  => 5,
+                :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    def test_range_size_two_map_after_touches
+        expected = [
+            10..10,
+            200..200
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..11,
+            {
+                :src  => 11,
+                :dest => 200,
+                :size => 11
+            }
+        )
+    end
+
+    #
+    # map_size_two
+    #
+
+    def test_map_size_two_at_range_0
+        expected = [
+            200..201,
+            12..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 10,
+                :dest => 200,
+                :size => 2
+            }
+        )
+    end
+
+    def test_map_size_two_at_range_1
+        expected = [
+            10..10,
+            200..201,
+            13..20
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 11,
+                :dest => 200,
+                :size => 2
+            }
+        )
+    end
+
+    def test_map_size_two_at_range_last_minus_1
+        expected = [
+            10..18,
+            200..201,
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 19,
+                :dest => 200,
+                :size => 2
+            }
+        )
+    end
+
+    def test_map_size_two_at_range_last
+        expected = [
+            10..19,
+            200..200,
+        ]
+        assert_equal expected, test_sol.transform_range_via_map(
+            10..20,
+            {
+                :src  => 20,
+                :dest => 200,
+                :size => 2
             }
         )
     end
