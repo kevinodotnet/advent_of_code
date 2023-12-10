@@ -22,36 +22,76 @@ class Solution < AbstractSolution
   def boat_distance(hold_time, race_duration)
     move_time = race_duration - hold_time
     speed = hold_time
-    distance = 0
-    move_time.times do
-      distance += speed
-    end
-
-    distance
+    speed * move_time
   end
 
   def run_races
     @races.map do |r|
-      r[:variants] = (1..(r[:time]-1)).map do |hold_time|
-        distance = boat_distance(hold_time, r[:time])
-        next if distance <= r[:distance]
-        {
-          hold_time: hold_time,
-          distance: distance
-        }
-      end.compact
+      min = 1
+      max = r[:time]-1
+
+      cursor = min
+
+      first_win = nil
+      last_win = nil
+
+      # find the first win position
+      loop do
+        cursor = min + ((max - min) / 2)
+        if cursor == min || cursor == max
+          first_win = [
+            min,
+            max,
+            cursor
+          ].select do |i|
+            boat_distance(i, r[:time]) > r[:distance]
+          end.uniq.min
+          break
+        end
+        distance = boat_distance(cursor, r[:time])
+        won = distance > r[:distance]
+        if won
+          max = cursor
+        else
+          min = cursor
+        end
+      end
+
+      # find the last win position
+      min = first_win
+      max = r[:time]-1
+      loop do
+        cursor = min + ((max - min) / 2)
+        if cursor == min || cursor == max
+          last_win = [
+            min,
+            max,
+            cursor
+          ].select do |i|
+            boat_distance(i, r[:time]) > r[:distance]
+          end.uniq.max
+          break
+        end
+        distance = boat_distance(cursor, r[:time])
+        won = distance > r[:distance]
+        if won
+          min = cursor
+        else
+          max = cursor
+        end
+      end
+
+      last_win - first_win + 1
     end
   end
 
   def part1
     parse
-    run_races
-    @races.map{|r| r[:variants].count}.inject(:*)
+    run_races.inject(:*)
   end
 
   def part2
     parse2
-    run_races
-    @races.map{|r| r[:variants].count}.inject(:*)
+    run_races.inject(:*)
   end
 end
