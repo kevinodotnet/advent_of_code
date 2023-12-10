@@ -68,7 +68,10 @@ class Solution < AbstractSolution
     # through unmodified
     #
     unless m[:range].overlaps?(r)
-      return [r]
+      return {
+        skipped: [r],
+        shifted: []
+      }
     end
 
     #
@@ -76,9 +79,12 @@ class Solution < AbstractSolution
     #
     if m[:range].cover?(r)
       diff = m[:dest] - m[:src]
-      return [
-        ((r.first+diff)..(r.last+diff))
-      ]
+      return {
+        skipped: [],
+        shifted: [
+          ((r.first+diff)..(r.last+diff))
+        ]
+      }
     end
 
     binding.pry if expect_no_chunking # this would be a surprise at this point
@@ -129,9 +135,15 @@ class Solution < AbstractSolution
     # the original single range [r] has been chunked into multiple ranges which should either
     # intersect perfectly with the mapping, or not intersect at all. Go recursive to use the
     # "pass-thru" or "shift" use cases as needed
-    ranges.map do |r|
-      transform_range_via_map(r, m, expect_no_chunking: true)
-    end.flatten
+    result = {
+      skipped: ranges.reject{|r| m[:range].overlaps?(r)},
+      shifted: ranges
+        .select{|r| m[:range].overlaps?(r)}
+        .map{|r| transform_range_via_map(r, m, expect_no_chunking: true)[:shifted]}
+        .flatten
+    }
+
+    result
   end
 
   def part2
@@ -161,18 +173,45 @@ class Solution < AbstractSolution
         (num..(num+t-1))
       ]
 
+      puts ""
+      puts ""
+      puts ""
+      puts "SEED! #{num} ranges: #{ranges}"
+      puts ""
+      puts ""
+      puts ""
+      puts ""
+
       # for each layer, transform [rangers] by applying the maps included in this layer, per #transform_range_via_map
-      layers.each do |maps|
+      transformed = layers.map do |maps|
+        puts "#"
+        puts "LAYER!"
+        puts "#"
+        shifted = []
+
         maps.each do |m|
+          puts ""
+          puts "  map:#{m}"
+          puts "  ranges.count: #{ranges.count}"
+          puts "  ranges: #{ranges}"
+          puts "  shifted.count: #{shifted.count}"
           ranges = ranges.map do |r|
-            transform_range_via_map(r, m)
+            puts ""
+            puts "  r: #{r}"
+            result = transform_range_via_map(r, m)
+            puts "  r.skipped: #{result[:skipped]}"
+            puts "  r.shifted: #{result[:shifted]}"
+            shifted += result[:shifted]
+            result[:skipped]
           end.flatten
         end
+
+        ranges = (ranges + shifted).flatten
       end
 
       # having transformed from the starting singular "seed range", find the minimum resulting location
       # after all translations
-      ranges.sort{|a, b| a.first <=> b.first}.first.first
+      transformed.last.sort{|a, b| a.first <=> b.first}.first.first
     end
 
     # pick the smallest of all of the seeds_to_locations
