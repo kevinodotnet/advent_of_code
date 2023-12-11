@@ -18,7 +18,8 @@ class SolutionTest < Minitest::Test
     end
 
     def test_part2
-        # assert_equal 456, Solution.new(data: SAMPLE_INPUT).part2
-        # assert_equal 456, Solution.new(data: real_input).part2
+        assert_equal :four_of_a_kind, Hand.new("AJJJ5".split(""), true).hand_type
+        assert_equal 5905, Solution.new(data: SAMPLE_INPUT).part2
+        assert_equal 249620106, Solution.new(data: real_input).part2
     end
 end
