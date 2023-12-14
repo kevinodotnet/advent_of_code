@@ -16,7 +16,10 @@ class SolutionTest < Minitest::Test
     end
 
     def test_part2
-        # assert_equal 456, Solution.new(data: SAMPLE_INPUT_1).part2
-        # assert_equal 456, Solution.new(data: real_input).part2
+        assert_equal -3, Solution.new(data: "0 3 6 9 12 15").part2
+        assert_equal 0, Solution.new(data: "1 3 6 10 15 21").part2
+        assert_equal 5, Solution.new(data: "10  13  16  21  30  45").part2
+        assert_equal 2, Solution.new(data: SAMPLE_INPUT_1).part2
+        assert_equal 456, Solution.new(data: real_input).part2
     end
 end
