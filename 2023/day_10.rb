@@ -80,7 +80,12 @@ class Solution < AbstractSolution
       end
       # binding.pry
     end
-    # puts @steps.map{|l| l.map{|c| c == '.' ? '.' : '*'}.join("")}.join("\n")
+    @grid.each_with_index.map do |row, y|
+      row.each_with_index.map do |c, x|
+        print @steps[y][x] == '.' ? '.' : c
+      end
+      puts "\n"
+    end
     @steps.flatten.reject{|s| s == "."}.max
   end
 
