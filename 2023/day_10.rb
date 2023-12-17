@@ -93,73 +93,36 @@ class Solution < AbstractSolution
     parse
     part1 # draw the line
 
-    polygon = []
-    @steps.each_with_index.map do |row, y|
-      matches = row.each_with_index.map do |c, x|
-        next if c == '.'
-        [y, x]
-      end.compact
-      next if matches == []
-      polygon += matches
-    end.compact
+    inside = @grid.each_with_index.map do |row, y|
+      puts "# inside row"
+      puts row.join("")
+      intersections = 0
+      on_trail = nil
+      prev_on_trail = nil
+      row.each_with_index.map do |c, x|
+        if @steps[y][x] != '.'
+          on_trail = true
+        else
+          on_trail = false
+        end
 
-    point_in_polygon?([0, 0], polygon)
-  end
-
-  private
-
-  #########################################################################################################
-  # ChatGPT:
-  # As a Ruby programmer solving Advent of Code problems, determine what tiles on a grid are
-  # enclosed by any polygon that can be drawn on the grid.
-  #
-  # Determining which tiles on a grid are enclosed by any polygon is a more complex problem.
-  # This is known as the Point In Polygon (PIP) problem. There are several algorithms to solve this,
-  # but one of the most common is the Ray Casting algorithm.
-  #
-  # The Ray Casting algorithm works by drawing a line from the point to a location outside of the polygon.
-  # If the line intersects the polygon an odd number of times, the point is inside the polygon. If it
-  # intersects an even number of times, the point is outside.
-  #
-  # Here's a simple implementation in Ruby:
-  #########################################################################################################
-
-  def point_in_polygon?(point, polygon)
-    return false if polygon.include?(point)
-    y, x = point
-    intersections = 0
+        if prev_on_trail.nil?
+          # first step
+          prev_on_trail = on_trail
+        end
 
 
 
-    point1 = polygon[-1] # Start with the last point in polygon
+        binding.pry unless prev_on_trail == on_trail
+
+        # intersections += 1 unless on_trail
+        # puts "c: #{c} i:#{intersections}"
+        intersections.odd? #  && @steps[y][x] == '.' # is not pipe, and is inside
+      end
+    end
+
     binding.pry
 
-    polygon.each do |point2|
-      if (point1[1] < y && point2[1] >= y) || (point1[1] >= y && point2[1] < y) # If edge is at least partially horizontal
-        if x < (point2[0] - point1[0]) * (y - point1[1]) / (point2[1] - point1[1]) + point1[0] # If intersection is to left of point
-          intersections += 1
-        end
-      end
-      point1 = point2
-    end
 
-    intersections.odd?
-  end
-
-  def enclosed_tiles(polygon, grid)
-    # grid is a 2D array
-    # Returns an array of points [x, y] that are enclosed by the polygon
-
-    enclosed_points = []
-
-    grid.each_with_index do |row, y|
-      row.each_with_index do |tile, x|
-        if point_in_polygon?([x, y], polygon)
-          enclosed_points << [x, y]
-        end
-      end
-    end
-
-    enclosed_points
   end
 end
