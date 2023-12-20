@@ -94,35 +94,54 @@ class Solution < AbstractSolution
     part1 # draw the line
 
     inside = @grid.each_with_index.map do |row, y|
-      puts "# inside row"
-      puts row.join("")
-      intersections = 0
-      on_trail = nil
-      prev_on_trail = nil
       row.each_with_index.map do |c, x|
-        if @steps[y][x] != '.'
-          on_trail = true
-        else
-          on_trail = false
-        end
-
-        if prev_on_trail.nil?
-          # first step
-          prev_on_trail = on_trail
-        end
-
-
-
-        binding.pry unless prev_on_trail == on_trail
-
-        # intersections += 1 unless on_trail
-        # puts "c: #{c} i:#{intersections}"
-        intersections.odd? #  && @steps[y][x] == '.' # is not pipe, and is inside
+        nil
       end
     end
 
-    binding.pry
+    inside.each_with_index do |row, y|
+      row.each_with_index do |c, x|
+        break if @grid[y][x] != '.'
+        inside[y][x] = false
+      end
+      x = row.count - 1
+      while x >= 0 do
+        break if @grid[y][x] != '.'
+        inside[y][x] = false
+        x -= 1
+      end
+    end
 
+    @grid.each_with_index do |row, y|
+      puts ""
+      puts "process row"
+      puts row.join("")
+      puts ""
 
+      prev_tile = nil
+      intersections = 0
+
+      row.each_with_index do |c, x|
+        if inside[y][x] == false
+          # outer shell; already determined to be outside
+          prev_tile = c
+          next
+        end
+
+        if @steps[y][x] == '.'
+          # on an empty tile, inside?
+          inside[y][x] = intersections.odd?
+        else
+          # on a pipe
+          intersections += 1
+          # if prev_tile == '.'
+          #   # stepped onto trail, vs. continuing on trail which is not an intersection?
+          #   intersections += 1
+          # end
+        end
+        prev_tile = c
+      end
+    end
+    inside.flatten.count{|t| t}
   end
 end
