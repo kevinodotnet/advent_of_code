@@ -15,6 +15,11 @@ class Solution < AbstractSolution
   end
 
   def part2
-    parse
+    left = @lists[0]
+    right = @lists[1]
+    score = left.map do |l|
+      l * right.count{|v| v == l}
+    end
+    score.sum
   end
 end
