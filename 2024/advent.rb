@@ -12,6 +12,7 @@ require "rgl/dijkstra"
 class AbstractSolution
   def initialize(data:)
     @data = data
+    parse
   end
 end
 
