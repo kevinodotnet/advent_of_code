@@ -5,13 +5,13 @@ class Solution < AbstractSolution
 
   def analyze(r)
     distances = r.each_cons(2).map{|a, b| (b-a)}
+    return false unless distances.map(&:abs).max <= 3
+
     pos_count = distances.count { |distance| distance.positive? }
-    result = {
-      under_limit: distances.map(&:abs).max <= 3,
-      same_sign: (pos_count == 0 || pos_count == distances.count),
-      no_zeros: distances.count(0) == 0
-    }
-    result.values.all?(true)
+    return false unless (pos_count == 0 || pos_count == distances.count)
+
+    return false unless distances.count(0) == 0
+    true
   end
 
   def part1
