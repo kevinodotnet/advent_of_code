@@ -4,10 +4,8 @@ class Solution < AbstractSolution
   end
 
   def part1
-    parse
   end
 
   def part2
-    parse
   end
 end
