@@ -21,48 +21,42 @@ class Solution < AbstractSolution
     @visited = Set.new
   end
 
-  def position_peek
-    next_pos = @pos.map.with_index{|p, i| p + DIRS[@dir][i]}
+  def position_peek(board:, pos:, dir:)
+    next_pos = pos.map.with_index{|p, i| p + DIRS[dir][i]}
     return nil if next_pos[0] < 0 || next_pos[1] < 0
-    return nil if next_pos[0] >= @data.length || next_pos[1] >= @data[0].length
+    return nil if next_pos[0] >= board.length || next_pos[1] >= board[0].length
     next_pos
   end
 
-  def board_peek
-    return nil if position_peek.nil?
-    @data[position_peek[0]][position_peek[1]]
+  def board_peek(board:, pos:, dir:)
+    new_pos = position_peek(board: board, pos: pos, dir: dir)
+    return nil if new_pos.nil?
+    board[new_pos[0]][new_pos[1]]
   end
 
-  def print_state
-    puts "#" * 50
-    puts "#" * 50
-    puts "#" * 50
-    puts ""
-    puts @data.map{|d| d.join("")}.join("\n")
-    puts ""
-    puts "pos: #{@pos}"
-    puts "dir: #{DIRS[@dir]}"
-    puts "vis: #{@visited.count} u: #{@visited.to_a.map{|v| v[:pos]}.uniq.count}"
+  def explore(board:, pos:, dir:)
+    visited = Set.new
+    loop do
+      visited.add({
+        pos: pos,
+        dir: DIRS[dir]
+      })
+
+      break if board_peek(board: board, pos: pos, dir: dir).nil?
+
+      if board_peek(board: board, pos: pos, dir: dir) == "#"
+        dir = (dir + 1) % DIRS.length
+        board[pos[0]][pos[1]] = "@"
+      else
+        pos = position_peek(board: board, pos: pos, dir: dir)
+        board[pos[0]][pos[1]] = "X"
+      end
+    end
+    visited
   end
 
   def part1
-    loop do
-      @visited.add({
-        pos: @pos,
-        dir: DIRS[@dir]
-      })
-
-      break if board_peek.nil?
-
-      if board_peek == "#"
-        @dir = (@dir + 1) % DIRS.length
-        @data[@pos[0]][@pos[1]] = "@"
-      else
-        @pos = position_peek
-        @data[@pos[0]][@pos[1]] = "X"
-      end
-    end
-    @visited.to_a.map{|v| v[:pos]}.uniq.count
+    explore(board: @data, pos: @pos, dir: @dir).to_a.map{|v| v[:pos]}.uniq.count
   end
 
   def part2
