@@ -50,7 +50,7 @@ class Solution < AbstractSolution
 
       bp = board_peek(board: board, pos: pos, dir: dir)
 
-      if bp == "#" || bp == "!"
+      if bp == "#"
         dir = (dir + 1) % DIRS.length
         board[pos[0]][pos[1]] = "@"
       else
@@ -82,50 +82,22 @@ class Solution < AbstractSolution
 
     tested = {}
 
-    board2 = @data.deep_dup
-    last_iteration_debug = ''
+    # board2 = @data.deep_dup
     visited_list.each_with_index do |v, i|
-      print last_iteration_debug
-      puts " #{i}/#{visited_list.count}" if i % 50 == 0
-      test_board = board2.deep_dup
-      test_pos = position_peek(board: test_board, pos: v[:pos], dir: v[:diri])
+      test_pos = position_peek(board: board, pos: v[:pos], dir: v[:diri])
       next if test_pos.nil?
-      if tested[test_pos]
-        # binding.pry
-        last_iteration_debug = '.'
-        next
-      end
+      next if tested[test_pos]
 
-      #print_board(test_board)
-      test_board[test_pos[0]][test_pos[1]] = "!"
       test_diri = (v[:diri] + 1) % DIRS.length
-      # puts ""
-      # print_board(test_board)
 
-      r2 = explore(board: test_board, pos: v[:pos], dir: test_diri)
+      prev_value = board[test_pos[0]][test_pos[1]]
+      board[test_pos[0]][test_pos[1]] = "#"
+      r2 = explore(board: board, pos: v[:pos], dir: test_diri)
+      board[test_pos[0]][test_pos[1]] = prev_value
 
       tested[test_pos] = r2[:result]
       last_iteration_debug = (r2[:result] == :loops) ? 'l' : 'e'
-      # puts "i: #{i} tested: #{tested[test_pos]}"
-
-
-      # #print_board(test_board)
-      # #puts "result: #{r2[:result]}"
-      # # binding.pry
-
-      # if r2[:result] == :loops
-      #   puts "loop if placed at #{test_pos}"
-      #   looping_locations << test_pos
-      #   # binding.pry
-      #   # binding.pry
-      #   # looping_count += 1
-      #   # puts ""
-      #   # print_board(test_board)
-      #   # puts "loops at #{v[:pos]} with dir #{v[:diri]}"
-      #   # binding.pry
-      # end
     end
-    # binding.pry
     tested.values.count(:loops)
   end
 end
