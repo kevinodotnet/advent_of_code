@@ -16,7 +16,7 @@ class AbstractSolution
   end
 end
 
-code_file = Dir["*"].select{|f| f.match(/^day_\d\d\.rb/)}.sort.last
+code_file = ARGV.first || Dir["*"].select{|f| f.match(/^day_\d\d\.rb/)}.sort.last
 test_file = code_file.gsub(/\.rb/, '_test.rb')
 input_file = code_file.gsub(/\.rb/, '.input')
 
