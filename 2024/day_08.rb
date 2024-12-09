@@ -37,30 +37,36 @@ class Solution < AbstractSolution
     nil
   end
 
-  def part1
+  def solve(single_step)
     antinodes = Set.new
     @antennas.map{|a| a[:f]}.uniq.each do |f|
       same_f = @antennas.select{|a| a[:f] == f}
       same_f.each_with_index do |a, i|
         others = same_f[i+1..]
         others.each do |o|
-          dis = {
-            y: o[:y] - a[:y],
-            x: o[:x] - a[:x]
-          }
-          a1 = {
-            f: a[:f],
-            y: o[:y] + dis[:y],
-            x: o[:x] + dis[:x]
-          }
-          a2 = {
-            f: a[:f],
-            y: a[:y] + dis[:y] * -1,
-            x: a[:x] + dis[:x] * -1
-          }
-          [a1, a2].each do |a|
-            v = board_peek(y: a[:y], x: a[:x])
-            antinodes << a if v
+          distance = single_step ? 1 : 0
+          loop do
+            dis = {
+              y: (o[:y] - a[:y]) * distance,
+              x: (o[:x] - a[:x]) * distance
+            }
+            a1 = {
+              f: a[:f],
+              y: o[:y] + dis[:y],
+              x: o[:x] + dis[:x]
+            }
+            a2 = {
+              f: a[:f],
+              y: a[:y] + dis[:y] * -1,
+              x: a[:x] + dis[:x] * -1
+            }
+            v1 = board_peek(y: a1[:y], x: a1[:x])
+            v2 = board_peek(y: a2[:y], x: a2[:x])
+            break unless v1 || v2
+            antinodes << a1 if v1
+            antinodes << a2 if v2
+            break if single_step
+            distance += 1
           end
         end
       end
@@ -68,6 +74,11 @@ class Solution < AbstractSolution
     antinodes.map{|a| a.except(:f)}.uniq.count
   end
 
+  def part1
+    solve(true)
+  end
+
   def part2
+    solve(false)
   end
 end
