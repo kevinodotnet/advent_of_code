@@ -79,7 +79,6 @@ class Solution < AbstractSolution
 
     tested = {}
 
-    # board2 = @data.deep_dup
     visited.each_with_index do |v, i|
       test_pos = position_peek(board: board, pos: v[:pos], dir: v[:diri])
       next if test_pos.nil?
@@ -93,7 +92,6 @@ class Solution < AbstractSolution
       board[test_pos[0]][test_pos[1]] = prev_value
 
       tested[test_pos] = r2[:result]
-      last_iteration_debug = (r2[:result] == :loops) ? 'l' : 'e'
     end
     tested.values.count(:loops)
   end
