@@ -17,7 +17,7 @@ class Solution < AbstractSolution
             else
               v.send(op, b)
             end
-          end
+          end.reject{|v| v > goal}
         end
       end
       values.flatten.any?(goal)
