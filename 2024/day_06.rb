@@ -35,16 +35,14 @@ class Solution < AbstractSolution
 
   def explore(board:, pos:, dir:)
     visited = Set.new
-    visited_list = []
     loop do
       pos_dir = {
         pos: pos,
         dir: DIRS[dir],
         diri: dir
       }
-      return { result: :loops, visited: visited, visited_list: visited_list } if visited.include?(pos_dir)
+      return { result: :loops, visited: visited } if visited.include?(pos_dir)
       visited << pos_dir
-      visited_list << pos_dir
 
       break if board_peek(board: board, pos: pos, dir: dir).nil?
 
@@ -58,7 +56,7 @@ class Solution < AbstractSolution
         board[pos[0]][pos[1]] = "X"
       end
     end
-    return { result: :exits, visited: visited, visited_list: visited_list }
+    return { result: :exits, visited: visited }
   end
 
   def part1
@@ -68,7 +66,7 @@ class Solution < AbstractSolution
 
   def print_board(board)
     puts [" ", " ", board.first.length.times.map{|i| i}.join("")].join("")
-    board.each_with_index.map do |r, i| 
+    board.each_with_index.map do |r, i|
       puts [i, " ", r.join("")].join("")
     end
     nil
@@ -78,12 +76,11 @@ class Solution < AbstractSolution
     board = @data.deep_dup
     result = explore(board: board, pos: @pos, dir: @dir)
     visited = result[:visited]
-    visited_list = result[:visited_list]
 
     tested = {}
 
     # board2 = @data.deep_dup
-    visited_list.each_with_index do |v, i|
+    visited.each_with_index do |v, i|
       test_pos = position_peek(board: board, pos: v[:pos], dir: v[:diri])
       next if test_pos.nil?
       next if tested[test_pos]
