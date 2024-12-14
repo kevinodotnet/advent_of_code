@@ -7,7 +7,7 @@ class Solution < AbstractSolution
   ]
 
   def parse
-    @data = @data.split("\n").map{|l| l.split("").map(&:to_i)}
+    @data = @data.split("\n").map{|l| l.split("").map{|c| c == '.' ? '.' : c.to_i}}
     @trailheads = {}
     @summits = []
     @data.map.with_index do |row, y|
@@ -35,31 +35,41 @@ class Solution < AbstractSolution
     end.compact
   end
 
-  def search_for_trailheads(s, p)
+  def search_for_trailheads(s, p, path)
     height = @data[p[0]][p[1]]
 
     if height == 0
       # summit s can be reached from this trailhead
-      @trailheads[p] ||= Set.new
-      @trailheads[p] << s
-      return
+      @trailheads[p] ||= {
+        summits: Set.new,
+        paths: Set.new
+      }
+      @trailheads[p][:summits] << s
+      @trailheads[p][:paths] << path
+      return 1 # trailheads reach only self
     end
 
-    peers(p).select do |peer|
+    peers(p).each do |peer|
       next unless @data[peer[0]][peer[1]] == height - 1
-      search_for_trailheads(s, peer)
+      search_for_trailheads(s, peer, [*path, peer])
     end
   end
 
   def part1
     @summits.each do |s|
-      search_for_trailheads(s, s)
+      search_for_trailheads(s, s, [s])
     end
     @trailheads.map do |k, v|
-      v.count
+      v[:summits].count
     end.sum
   end
 
   def part2
+    @summits.each do |s|
+      search_for_trailheads(s, s, [s])
+    end
+    @trailheads.map do |k, v|
+      v[:paths].count
+    end.sum
   end
 end
