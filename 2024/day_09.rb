@@ -76,7 +76,56 @@ class Solution < AbstractSolution
     r.flatten.compact.sum
   end
 
+  def compact_data
+    start = @data.length
+    @data.each_with_index do |b, i|
+      if b[:type] == :free && @data[i+1] && @data[i+1][:type] == :free
+        b[:length] += @data[i+1][:length]
+        @data.delete_at(i+1)
+      end
+      if b[:length] == 0
+        @data.delete_at(i)
+      end
+    end
+    # binding.pry if start != start = @data.length
+  end
+
   def part2
+    files = @data.select{|b| b[:type] == :file}.sort_by{|b| b[:id]}.reverse
+    files.each_with_index do |file, fi|
+      puts "fi: #{fi}  / #{files.length}"
+      free_index = 0
+      file_index = @data.index(file)
+      # puts ""
+      # puts "#" * 50
+      # puts "file_index: #{file_index} file: #{file}"
+      @data.each_with_index do |b, i|
+        # puts "  i: #{i} b: #{b}"
+        next unless b[:type] == :free
+        next unless b[:length] >= file[:length]
+        break if file_index < i
+        # puts "  swap!"
+        # print_data
+        move_to_free(i, file_index)
+        compact_data
+        # print_data
+        # binding.pry
+        break
+      end
+    end
+
+    # binding.pry
+
+    pos = 0
+
+    r = @data.map do |b|
+      b[:length].times.map do
+        v = pos * (b[:type] == :file ? b[:id] : 0)
+        pos += 1
+        v
+      end
+    end
+    r.flatten.sum
   end
 end
 
