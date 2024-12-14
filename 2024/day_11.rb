@@ -1,44 +1,54 @@
 class Solution < AbstractSolution
   def parse
     @data = @data.scan(/\d+/).map(&:to_i)
-  end
-
-  def blink
-    i = 0
-    while i < @data.length
-      v = @data[i]
-      # If the stone is engraved with the number 0, it is replaced by a stone engraved with the number 1.
-      if v == 0
-        @data[i] = 1
-        i += 1
-        next
-      end
-
-      # If the stone is engraved with a number that has an even number of digits, it is replaced by two stones. 
-      # The left half of the digits are engraved on the new left stone, and the right half of the digits are engraved on the new right stone. 
-      # (The new numbers don't keep extra leading zeroes: 1000 would become stones 10 and 0.)
-      v_as_s = v.to_s
-      if v_as_s.length.even?
-        left = v_as_s[0...(v_as_s.length / 2)].to_i
-        right = v_as_s[(v_as_s.length / 2)..-1].to_i
-
-        @data[i] = left
-        @data.insert(i + 1, right)
-        i += 2 # skip added stone
-        next
-      end
-
-      # If none of the other rules apply, the stone is replaced by a new stone; the old stone's number multiplied by 2024 is engraved on the new stone.
-      @data[i] = v * 2024
-      i += 1
+    @stones = {
+      :zero => {},
+      :even => {},
+      :other => {},
+    }
+    @data.each do |v|
+      @stones[type(v)][v] ||= 0
+      @stones[type(v)][v] += 1
     end
   end
 
-  def part1(blinks)
-    blinks.times { blink }
-    @data.count
+  def type(v)
+    return :zero if v == 0
+    return :even if v.to_s.length.even?
+    :other
   end
 
-  def part2
+  def blink
+    new_stones = {
+      :zero => {},
+      :even => {},
+      :other => {},
+    }
+
+    new_stones[:other][1] = @stones[:zero][0] || 0
+
+    @stones[:even].each do |i, count|
+      s = i.to_s
+      left = s[0..s.length/2-1].to_i
+      right = s[s.length/2..-1].to_i
+
+      new_stones[type(left)][left] ||= 0
+      new_stones[type(left)][left] += count
+      new_stones[type(right)][right] ||= 0
+      new_stones[type(right)][right] += count
+    end
+
+    @stones[:other].each do |i, count|
+      v = i * 2024
+      new_stones[type(v)][v] ||= 0
+      new_stones[type(v)][v] += count
+    end
+
+    @stones = new_stones
+  end
+
+  def solve(blinks)
+    blinks.times { blink }
+    @stones.map { |k, v| v.values.sum }.sum
   end
 end
