@@ -23,7 +23,7 @@ class Solution < AbstractSolution
     puts @data.map{|l| l.join("")}.join("\n")
   end
 
-  def part1
+  def solve
     @crops = {}
     @points = {}
     @data.each_with_index do |row, y|
@@ -62,7 +62,7 @@ class Solution < AbstractSolution
       end
     end
 
-    costs = @crops.map do |uuid, c|
+    @crops.each do |uuid, c|
       area = c[:p].length
       perimeter = c[:p].map do |p|
         fences = peers(p).map do |peer|
@@ -79,7 +79,11 @@ class Solution < AbstractSolution
       c[:perimeter] = perimeter.sum
       c[:cost] = area * perimeter.sum
     end
-    costs.sum
+  end
+
+  def part1
+    solve
+    @crops.sum{|u, c| c[:cost]}
   end
 
   def part2
