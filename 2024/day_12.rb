@@ -26,6 +26,8 @@ class Solution < AbstractSolution
   def solve
     @crops = {}
     @points = {}
+
+    # create crops, one per cell
     @data.each_with_index do |row, y|
       row.each_with_index do |cell, x|
         c = {
@@ -39,6 +41,7 @@ class Solution < AbstractSolution
       end
     end
 
+    # merge cells of same crop, adjacent to each other
     @data.each_with_index do |row, y|
       row.each_with_index do |cell, x|
         p = [y, x]
@@ -63,21 +66,22 @@ class Solution < AbstractSolution
     end
 
     @crops.each do |uuid, c|
-      area = c[:p].length
-      perimeter = c[:p].map do |p|
-        fences = peers(p).map do |peer|
-          if peer.nil?
-            1
+      c[:area] = c[:p].length
+      c[:fences] = {}
+      c[:p].each do |p|
+        c[:fences][p] = {}
+        DIRS.map do |dir|
+          peer = [p[0] + dir[0], p[1] + dir[1]]
+          fenced = if @points[peer].nil?
+            true
           else
-            peer_uuid = @points[[peer[0],peer[1]]]
-            peer_uuid == uuid ? 0 : 1
+            @points[peer] != uuid
           end
+          c[:fences][p][dir] = fenced
         end
-        fences.sum
       end
-      c[:area] = area
-      c[:perimeter] = perimeter.sum
-      c[:cost] = area * perimeter.sum
+      c[:perimeter] = c[:fences].values.map{|f| f.values}.flatten.count(true)
+      c[:cost] = c[:area] * c[:perimeter]
     end
   end
 
@@ -87,5 +91,9 @@ class Solution < AbstractSolution
   end
 
   def part2
+    solve
+
+    binding.pry
+    @crops.sum{|u, c| c[:cost]}
   end
 end
