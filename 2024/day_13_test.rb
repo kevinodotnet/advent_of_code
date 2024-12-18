@@ -22,15 +22,12 @@ class SolutionTest < Minitest::Test
         File.read("day_#{day}.input")
     end
 
-    focus
     def test_part1
         assert_equal 480, Solution.new(data: SAMPLE_INPUT_1).part1
         assert_equal 31589, Solution.new(data: real_input).part1
     end
 
-    #focus
     def test_part2
-        assert_equal 456, Solution.new(data: SAMPLE_INPUT_1).part2
-        # assert_equal 456, Solution.new(data: real_input).part2
+        assert_equal 98080815200063, Solution.new(data: real_input).part2
     end
 end
