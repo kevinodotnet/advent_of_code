@@ -7,9 +7,9 @@ class Solution < AbstractSolution
     end
   end
 
-  def print_board(board_x, board_y)
-    board_y.times do |y|
-      board_x.times do |x|
+  def print_board
+    @board_y.times do |y|
+      @board_x.times do |x|
         robots_on_spot = @robots.select{|r| r[:x] == x && r[:y] == y}.count
         print robots_on_spot > 0 ? robots_on_spot : "."
       end
@@ -59,6 +59,18 @@ class Solution < AbstractSolution
     end.flatten.reduce(&:*)
   end
 
-  def part2
+  def part2(board_x = 101, board_y = 103)
+    @board_x = board_x
+    @board_y = board_y
+    seconds = 0
+    loop do
+      seconds += 1
+      step
+
+      # Do "CROPS" from previous puzzle.
+      # Look for cases where the biggest crop is WAY bigger than the next 5 crops average, skip 1
+      # This only happens when the robots sync up for the tree (and box) but everything else is mainly alone
+
+    end
   end
 end
