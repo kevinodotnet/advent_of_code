@@ -32,7 +32,7 @@ class Solution < AbstractSolution
     # impossible
   end
 
-  def part1
+  def solve
     @moves.each do |m|
       next if m == "\n"
       next unless robot_can_move(m)
@@ -53,15 +53,47 @@ class Solution < AbstractSolution
       end
     end
 
+    boxes = %w(O [ ])
+
     gps = @board.each_with_index.map do |row, y|
       row.each_with_index.map do |cell, x|
-        next unless cell == "O"
+        next unless boxes.include?(cell)
         y*100 + x
       end
     end
     gps.flatten.compact.sum
   end
 
+  def part1
+    solve
+  end
+
   def part2
+    @board.each_with_index do |row, y|
+      i = 0
+      while i < row.length
+        # If the tile is #, the new map contains ## instead.
+        # If the tile is O, the new map contains [] instead.
+        # If the tile is ., the new map contains .. instead.
+        # If the tile is @, the new map contains @. instead.
+        case row[i]
+        when "#"
+          #row[i] = "#"
+          row.insert(i+1, "#")
+        when "O"
+          row[i] = "["
+          row.insert(i+1, "]")
+        when "."
+          row[i] = "."
+          row.insert(i+1, ".")
+        when "@"
+          row[i] = "@"
+          row.insert(i+1, ".")
+        end
+        i += 2
+      end
+    end
+    #solve
+    print_board
   end
 end
