@@ -17,24 +17,33 @@ class Solution < AbstractSolution
     end
   end
 
+  def step
+    @robots.each do |r|
+      r[:x] += r[:dx]
+      r[:y] += r[:dy]
+      r[:x] %= @board_x
+      r[:y] %= @board_y
+    end
+  end
+
   def part1(board_x = 101, board_y = 103, seconds = 100)
-    # print_board(board_x, board_y)
+    @board_x = board_x
+    @board_y = board_y
+    seconds.times do |i|
+      step
+    end
+
     quadrants = {}
     @robots.each do |r|
-      r[:x] += r[:dx] * seconds
-      r[:y] += r[:dy] * seconds
-      r[:x] %= board_x
-      r[:y] %= board_y
-
-      top_bottom = if r[:y] < board_y / 2
+      top_bottom = if r[:y] < @board_y / 2
         :top
-      elsif r[:y] > board_y / 2
+      elsif r[:y] > @board_y / 2
         :bottom
       end
 
-      left_right = if r[:x] < board_x / 2
+      left_right = if r[:x] < @board_x / 2
         :left
-      elsif r[:x] > board_x / 2
+      elsif r[:x] > @board_x / 2
         :right
       end
 
@@ -45,7 +54,6 @@ class Solution < AbstractSolution
 
     [:top, :bottom].map do |tb|
       [:left, :right].map do |lr|
-        binding.pry if quadrants[tb].nil?
         quadrants[tb][lr]
       end
     end.flatten.reduce(&:*)
