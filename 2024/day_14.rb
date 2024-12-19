@@ -1,4 +1,11 @@
 class Solution < AbstractSolution
+  DIRS = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1]
+  ]
+
   def parse
     @data = @data.split("\n").map{|l| l.scan(/-?\d+/).map(&:to_i)}
     @robots = @data.map do |d|
@@ -68,9 +75,38 @@ class Solution < AbstractSolution
       step
 
       # Do "CROPS" from previous puzzle.
-      # Look for cases where the biggest crop is WAY bigger than the next 5 crops average, skip 1
+      # Look for case where the biggest crop is WAY bigger than typical (the first 50 seconds)
       # This only happens when the robots sync up for the tree (and box) but everything else is mainly alone
+      
+      crops = {}
+      points = {}
+      @robots.each do |r|
+        r[:crop] = SecureRandom.uuid
+        crops[r[:crop]] = Set.new
+        crops[r[:crop]] << r
+        points[[r[:y], r[:x]]] = r
+      end
+      @robots.each do |r|
+        DIRS.each do |d|
+          py = r[:y] + d[0]
+          px = r[:x] + d[1]
+          peer = points[[py, px]]
+          next unless peer
 
+          r_crop_id = r[:crop]
+          p_crop_id = peer[:crop]
+
+          next if r_crop_id == p_crop_id
+
+          crops[p_crop_id].each do |p|
+            p[:crop] = r_crop_id
+            crops[r_crop_id] << p
+          end
+          crops.delete(p_crop_id)
+        end
+      end
+      areas = crops.values.map{|c| c.count}
+      return seconds if areas.max > 20
     end
   end
 end
