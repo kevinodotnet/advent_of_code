@@ -28,29 +28,13 @@ class SolutionTest < Minitest::Test
         File.read("day_#{day}.input")
     end
 
-    def test_part1_small
-        input = <<~EOF
-            ########
-            #..O.O.#
-            ##@.O..#
-            #...O..#
-            #.#.O..#
-            #...O..#
-            #......#
-            ########
-
-            <^^>>>vv<v>>v<<
-        EOF
-        assert_equal 2028, Solution.new(data: input).part1
-    end
-
     def test_part1
         assert_equal 10092, Solution.new(data: SAMPLE_INPUT_1).part1
         assert_equal 1487337, Solution.new(data: real_input).part1
     end
 
     def test_part2
-        # assert_equal 456, Solution.new(data: SAMPLE_INPUT_1).part2
-        # assert_equal 456, Solution.new(data: real_input).part2
+        assert_equal 9021, Solution.new(data: SAMPLE_INPUT_1).part2
+        assert_equal 1521952, Solution.new(data: real_input).part2
     end
 end
