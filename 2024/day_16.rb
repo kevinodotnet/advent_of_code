@@ -53,6 +53,35 @@ class Solution < AbstractSolution
     moves.select{|m| m[:char] == 'E' || m[:char] == '.'}
   end
 
+  def print_board_with_moves(ms)
+    board = @data.map(&:dup)
+    ms.each do |m|
+      board[m[:pos][0]][m[:pos][1]] = 'O'
+    end
+    puts board.each_with_index.map{|r, y| [y < 10 ? "0#{y}" : y," ",r].flatten.join("")}.join("\n")
+  end
+
+  def print_board_with_touched(touched, tip)
+    board = @data.map(&:dup)
+    touched.each do |ts|
+      ts.each do |m|
+        # binding.pry
+        board[m[0]][m[1]] = 'O'
+      end
+    end
+    board[tip[0]][tip[1]] = 'T'
+    puts board.each_with_index.map{|r, y| [y < 10 ? "0#{y}" : y," ",r].flatten.join("")}.join("\n")
+  end
+
+  def print_moves(moves)
+    mmm = moves.sort_by{|ms| ms.last[:running]}.map do |ms|
+      ms = ms.deep_dup
+      ms[0][:dir] = 'S'
+      ms.map{|m| m[:dir]}.join("") + " #{ms.last[:running]}"
+    end.join("\n")
+    puts mmm
+  end
+
   def solve
     pos = @start
     dir = @dir
@@ -73,35 +102,63 @@ class Solution < AbstractSolution
 
     aborted = 0
 
+    best_paths = []
+    loops = 0
+
     while moves.any?
+      puts "loops: #{loops += 1}"
+      all_touched = Set.new
+      moves.each_with_index do |m, i|
+        #puts "UNDERWAY: #{i}/#{moves.count} #{m.last[:pos]} #{m.last[:char]} #{m.last[:running]}"
+        #print_board_with_moves(m)
+        all_touched << m.map{|t| t[:pos]}
+        # binding.pry if i >= 2
+      end
+      puts "ALL"
       tip = moves.sort_by{|m| m.last[:running]}.first
+      print_board_with_touched(all_touched, tip.last[:pos])
+      puts ""
+      print_moves(moves)
+      # binding.pry
+      # if tip.last[:pos] == [10, 3]
+      #   binding.pry
+      # end
+
+      # print_board_with_moves(tip)
       @points[tip.last[:pos]] ||= tip.last
       if @points[tip.last[:pos]][:running] < tip.last[:running]
+        binding.pry
         moves.delete(tip)
         next
       end
       valid_moves(tip.last).each do |m|
         if @points[m[:pos]]
-          if m[:running] >= @points[m[:pos]][:running]
+          if m[:running] > @points[m[:pos]][:running]
+            binding.pry if loops == 14
             next
           end
         end
         @points[m[:pos]] = m
         if m[:char] == 'E'
-          return m[:running]
+          binding.pry
+          moves = moves.reject{|m2| m2.last[:running] > m[:running]}
+          best_paths << tip.dup + [m]
         end
         moves << tip.dup + [m]
       end
       moves.delete(tip)
     end
-    binding.pry
+    best_paths
   end
 
   def part1
-    solve
+    r = solve
+    r.first.last[:running]
   end
 
   def part2
-    solve
+    r = solve
+    r.flatten.map{|m| m[:pos]}.uniq.count
+    # binding.pry
   end
 end
