@@ -24,33 +24,47 @@ class Solution < AbstractSolution
 
   def next_move(prev_move, type)
     i = DIRS.keys.index(prev_move[:dir])
-    if type == :left
-      i -= 1
-    elsif type == :right
-      i += 1
-    end
-    i = i % DIRS.length
     d = DIRS.values[i]
     pos = prev_move[:pos]
     new_pos = pos[0] + d[0], pos[1] + d[1]
+    if type == :forward
+      next_char = @data[new_pos[0]][new_pos[1]]
+      score = 1
+    elsif type == :left
+      i -= 1
+      score = 1000
+      next_char = @data[new_pos[0]][new_pos[1]]
+      new_pos = pos
+    elsif type == :right
+      i += 1
+      score = 1000
+      next_char = @data[new_pos[0]][new_pos[1]]
+      new_pos = pos
+    end
+    i = i % DIRS.length
     next_move = {
-      id: @id += 1,
-      char: @data[new_pos[0]][new_pos[1]],
+      char: next_char,
       pos: new_pos,
       type: type,
       dir: DIRS.keys[i],
-      score: 1 + (type == :forward ? 0 : 1000),
+      score: score,
     }
     next_move[:running] = prev_move[:running] + next_move[:score]
     next_move
   end
 
   def valid_moves(prev_move)
+    forward = next_move(prev_move, :forward)
+    left = next_move(prev_move, :left)
+    left_forward = next_move(left, :forward)
+    right = next_move(prev_move, :right)
+    right_forward = next_move(right, :forward)
+
     moves = []
-    moves << next_move(prev_move, :left)
-    moves << next_move(prev_move, :right)
-    moves << next_move(prev_move, :forward)
-    moves.select{|m| m[:char] == 'E' || m[:char] == '.'}
+    moves << [forward] if forward[:char] != '#'
+    moves << [left, left_forward] if left_forward[:char] != '#'
+    moves << [right, right_forward] if right_forward[:char] != '#'
+    moves
   end
 
   def print_board_with_moves(ms)
@@ -89,7 +103,6 @@ class Solution < AbstractSolution
     @id = 0
 
     move = {
-      id: @id += 1,
       char: @data[pos[0]][pos[1]],
       pos: pos,
       type: :start,
@@ -106,45 +119,51 @@ class Solution < AbstractSolution
     loops = 0
 
     while moves.any?
-      puts "loops: #{loops += 1}"
-      all_touched = Set.new
-      moves.each_with_index do |m, i|
-        #puts "UNDERWAY: #{i}/#{moves.count} #{m.last[:pos]} #{m.last[:char]} #{m.last[:running]}"
-        #print_board_with_moves(m)
-        all_touched << m.map{|t| t[:pos]}
-        # binding.pry if i >= 2
-      end
-      puts "ALL"
       tip = moves.sort_by{|m| m.last[:running]}.first
-      print_board_with_touched(all_touched, tip.last[:pos])
-      puts ""
-      print_moves(moves)
-      # binding.pry
+      if false
+        puts "loops: #{loops += 1}"
+        all_touched = Set.new
+        moves.each_with_index do |m, i|
+          #puts "UNDERWAY: #{i}/#{moves.count} #{m.last[:pos]} #{m.last[:char]} #{m.last[:running]}"
+          #print_board_with_moves(m)
+          all_touched << m.map{|t| t[:pos]}
+          # binding.pry if i >= 2
+        end
+        puts "ALL moves: #{moves.count}"
+        print_board_with_touched(all_touched, tip.last[:pos])
+        puts ""
+        print_moves(moves)
+      end
+    # binding.pry
       # if tip.last[:pos] == [10, 3]
       #   binding.pry
       # end
 
       # print_board_with_moves(tip)
-      @points[tip.last[:pos]] ||= tip.last
-      if @points[tip.last[:pos]][:running] < tip.last[:running]
-        binding.pry
-        moves.delete(tip)
-        next
-      end
+      # @points[tip.last[:pos]] ||= tip.last
+      # if @points[tip.last[:pos]][:running] < tip.last[:running]
+      #   binding.pry
+      #   moves.delete(tip)
+      #   next
+      # end
       valid_moves(tip.last).each do |m|
-        if @points[m[:pos]]
-          if m[:running] > @points[m[:pos]][:running]
-            binding.pry if loops == 14
-            next
-          end
+        if tip.any?{|m2| m2[:pos] == m.last[:pos]} # no loop in same path
+          next
         end
-        @points[m[:pos]] = m
-        if m[:char] == 'E'
-          binding.pry
-          moves = moves.reject{|m2| m2.last[:running] > m[:running]}
-          best_paths << tip.dup + [m]
+        # if @points[m[:pos]]
+        #   binding.pry
+        #   if m[:running] > @points[m[:pos]][:running]
+        #     binding.pry if loops == 14
+        #     next
+        #   end
+        # end
+        # @points[m[:pos]] = m
+        if m.last[:char] == 'E'
+          # binding.pry
+          moves = moves.reject{|m2| m2.last[:running] > m.last[:running]}
+          best_paths << tip.dup + m
         end
-        moves << tip.dup + [m]
+        moves << tip.dup + m
       end
       moves.delete(tip)
     end

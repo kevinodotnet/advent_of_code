@@ -50,6 +50,7 @@ class SolutionTest < Minitest::Test
         assert_equal 11048, Solution.new(data: SAMPLE_INPUT_2).part1
     end
 
+    focus
     def test_part1
         assert_equal 65436, Solution.new(data: real_input).part1
     end
@@ -58,7 +59,6 @@ class SolutionTest < Minitest::Test
         assert_equal 45, Solution.new(data: SAMPLE_INPUT_1).part2
     end
 
-    focus
     def test_part2b
         assert_equal 45, Solution.new(data: SAMPLE_INPUT_1).part2
     end
