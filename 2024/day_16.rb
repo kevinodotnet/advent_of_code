@@ -62,8 +62,8 @@ class Solution < AbstractSolution
 
     moves = []
     moves << [forward] if forward[:char] != '#'
-    moves << [left, left_forward] if left_forward[:char] != '#'
     moves << [right, right_forward] if right_forward[:char] != '#'
+    moves << [left, left_forward] if left_forward[:char] != '#'
     moves
   end
 
@@ -120,15 +120,13 @@ class Solution < AbstractSolution
 
     while moves.any?
       tip = moves.sort_by{|m| m.last[:running]}.first
+      # tip = moves.first
       puts "loops: #{loops += 1} moves: #{moves.count}"
 
       if loops % 5000 == 0
         all_touched = Set.new
         moves.each_with_index do |m, i|
-          #puts "UNDERWAY: #{i}/#{moves.count} #{m.last[:pos]} #{m.last[:char]} #{m.last[:running]}"
-          #print_board_with_moves(m)
           all_touched << m.map{|t| t[:pos]}
-          # binding.pry if i >= 2
         end
         print_board_with_touched(all_touched, tip.last[:pos])
         puts "ALL moves: #{moves.count}"
@@ -146,10 +144,17 @@ class Solution < AbstractSolution
         if m.last[:char] == 'E'
           moves = moves.reject{|m2| m2.last[:running] > m.last[:running]}
           best_paths << tip.dup + m
-          binding.pry
           next
         end
-        moves << tip.dup + m
+
+        new_move = tip.dup + m
+
+        binding.pry if @points[m.last[:pos]]
+        @points[m.last[:pos]] ||= new_move # only store the first time we reach a point
+        binding.pry
+        moves.unshift(new_move)
+
+        moves << new_move
       end
       moves.delete(tip)
     end
