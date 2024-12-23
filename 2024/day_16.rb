@@ -120,8 +120,9 @@ class Solution < AbstractSolution
 
     while moves.any?
       tip = moves.sort_by{|m| m.last[:running]}.first
-      if false
-        puts "loops: #{loops += 1}"
+      puts "loops: #{loops += 1} moves: #{moves.count}"
+
+      if loops % 5000 == 0
         all_touched = Set.new
         moves.each_with_index do |m, i|
           #puts "UNDERWAY: #{i}/#{moves.count} #{m.last[:pos]} #{m.last[:char]} #{m.last[:running]}"
@@ -129,39 +130,24 @@ class Solution < AbstractSolution
           all_touched << m.map{|t| t[:pos]}
           # binding.pry if i >= 2
         end
-        puts "ALL moves: #{moves.count}"
         print_board_with_touched(all_touched, tip.last[:pos])
-        puts ""
-        print_moves(moves)
+        puts "ALL moves: #{moves.count}"
+        # puts ""
+        # print_moves(moves)
+        binding.pry
       end
-    # binding.pry
-      # if tip.last[:pos] == [10, 3]
-      #   binding.pry
-      # end
 
-      # print_board_with_moves(tip)
-      # @points[tip.last[:pos]] ||= tip.last
-      # if @points[tip.last[:pos]][:running] < tip.last[:running]
-      #   binding.pry
-      #   moves.delete(tip)
-      #   next
-      # end
       valid_moves(tip.last).each do |m|
-        if tip.any?{|m2| m2[:pos] == m.last[:pos]} # no loop in same path
-          next
+        next if tip.any?{|m2| m2[:pos] == m.last[:pos]} # no loop in same path
+        if best_paths.count > 0
+          next if best_paths.last.last[:running] < m.last[:running]
         end
-        # if @points[m[:pos]]
-        #   binding.pry
-        #   if m[:running] > @points[m[:pos]][:running]
-        #     binding.pry if loops == 14
-        #     next
-        #   end
-        # end
-        # @points[m[:pos]] = m
+
         if m.last[:char] == 'E'
-          # binding.pry
           moves = moves.reject{|m2| m2.last[:running] > m.last[:running]}
           best_paths << tip.dup + m
+          binding.pry
+          next
         end
         moves << tip.dup + m
       end
@@ -172,6 +158,7 @@ class Solution < AbstractSolution
 
   def part1
     r = solve
+    # binding.pry
     r.first.last[:running]
   end
 
