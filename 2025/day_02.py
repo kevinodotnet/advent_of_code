@@ -19,16 +19,21 @@ def parse(data):
         for range in data.strip().split(',')
     ]
 
-def valid_id(id):
+def valid_id(id, part2 = False):
     ids = str(id)
     # Check groups of increasing size from 2 up to half the string length
     for group_size in range(1, len(ids) // 2 + 1):
         groups = [ids[i:i+group_size] for i in range(0, len(ids), group_size)]
         if len(set(groups)) == 1:
             # all groups are the same
-            if len(groups) == 2:
-                # and there is a clean "repeats twice" only
-                return False
+            if part2:
+                if len(groups) >= 2:
+                    # and there is a clean repeats 2+
+                    return False
+            else:
+                if len(groups) == 2:
+                    # and there is a clean "repeats twice" only
+                    return False
 
     return True
 
@@ -37,13 +42,13 @@ def solve(data, part2 = False):
     for r in parse(data):
         print(f"checking: {r}")
         for id in range(r[0], r[1] + 1):
-            if not valid_id(id): 
+            if not valid_id(id, part2):
                 # print(f"id: {id} invalid")
                 invalid_id_sum += id
     print(f"invalid_id_sum: {invalid_id_sum}")
     return invalid_id_sum
 
 assert 1227775554 == solve(sample_input())
-assert 1 == solve(day_input())
-# assert 1 == solve(sample_input(), part2 = True)
-# assert 1 == solve(day_input(), part2 = True)
+assert 29940924880 == solve(day_input())
+assert 4174379265 == solve(sample_input(), True)
+assert 48631958998 == solve(day_input(), part2 = True)
